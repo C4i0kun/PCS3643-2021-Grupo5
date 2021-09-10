@@ -31,10 +31,7 @@
 
 **Pós-condições**: 
 
-Uma das condições abaixo:
-
 - Lote de produtos gerado com sucesso.
-- Lote de produtos não gerado devido a um cancelamento do processo.
 
 **Fluxos alternativos**: 
 
