@@ -7,6 +7,7 @@
 | Bernardo Rocha Coutinho     | 11288235 |
 | Caio de Souza Barbosa Costa | 11257734 |
 
-### Aulas
+### 👩‍🏫 Aulas
 
  - **[Aula1 - Workshop de Requisitos](Aula1)**
+ - **[Aula2 - Especificação Casos de Uso](Aula2)**
