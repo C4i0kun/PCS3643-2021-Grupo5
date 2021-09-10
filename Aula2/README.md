@@ -1,10 +1,12 @@
-# Especificação de Casos de Uso
+# Aula 2 - Especificação de Casos de Uso
 
-## Diagrama Casos de Uso
+## 📊 Diagrama de Casos de Uso
 
 ![image info](./diagrama_casos_de_uso.png)
 
-## Ofertar Lotes de Produtos
+## Especificação dos Casos de Uso
+
+### Ofertar Lotes de Produtos
 
 **Nome**: Ofertar lotes de produtos.
 
@@ -44,7 +46,7 @@ Uma das condições abaixo:
 - No passo 2, caso o vendedor não esteja autenticado, desvia para o caso de uso de autenticação.
 - No passo 5, caso o vendedor confirme a criação de um lote sem produtos, uma mensagem de erro é exibida e o caso de uso se encerra.
 
-## Realizar Leilão
+### Realizar Leilão
 
 **Nome**: Realizar Leilão.
 
@@ -92,9 +94,9 @@ Uma das condições abaixo:
  - No passo 2, caso o Leiloeiro não esteja autenticado, desvia para o caso de uso de autenticação.
  - No passo 3, caso não existam lotes cadastrados disponíveis no sistema, exibe uma mensagem informando que da indisponibilidade de lotes e encerra o caso de uso.
 
- ## Gerar Relatórios
+### Gerar Relatórios
 
- **Nome**: Gerar Relatórios.
+**Nome**: Gerar Relatórios.
 
 **Descrição**: Este caso de uso permite a geração de um relatório completo por meio do leiloeiro contendo várias informações referentes ao leilão que acaba de ser completado.
 
