@@ -10,9 +10,9 @@
 
 **Nome**: Ofertar lotes de produtos.
 
-**Descrição**: Este caso de uso permite ao leiloeiro o cadastramento de um lote de um ou mais produtos de um vendedor e define seus preços mínimos.
+**Descrição**: Este caso de uso permite o cadastramento de um lote de produtos.
 
-**Ator(es)**: Vendedor, Leiloeiro
+**Ator(es)**: Vendedor
 
 **Evento Iniciador**: Vendedor solicita a criação de um novo lote de produtos.
 
@@ -23,14 +23,11 @@
 **Sequência de Eventos**:
 
 1. Vendedor solicita a criação de um novo lote de produtos.
-2. O vendedor entra com dados dos produtos que deseja ofertar no lote, explicitando características como nome, quantidade, preço, etc.
-3. O sistema envia uma mensagem de confirmação ao vendedor.
-4. O vendedor confirma a criação do lote de de produtos.
-5. O leiloeiro cadastra o lote com o valor mínimo de lance, o período do leilão.
-6. Vendedor paga a taxa de comissão ao site.
-7. Leiloeiro registra o pagamento da taxa e confirma a oferta do lote.
-8. Sistema adiciona o lote no catálogo.
-9. Fim do caso de uso.
+2. Sistema confirma se o vendedor está autenticado.
+3. O vendedor entra com dados dos produtos que deseja ofertar, explicitando características como nome, quantidade, preço, etc.
+4. O sistema calcula o valor final do lote e envia uma mensagem de confirmação ao vendedor.
+5. O vendedor confirma a criação do lote de de produtos.
+6. Fim do caso de uso.
 
 **Pós-condições**: 
 
@@ -38,13 +35,13 @@
 
 **Fluxos alternativos**: 
 
-- No passo 3, o vendedor pode cancelar a sequência de eventos, finalizando o caso de uso sem criar um lote de produtos.
-- No passo 4, caso o vendedor não confirme a criação do lote de produtos, ele pode retorna ao passo 2 para editá-los e/ou cancelar a sequência de eventos.
-- No passo 6, caso o vendedor não pague a taxa de comissão, o leiloeiro pode cancelar a oferta do lote e encerra o caso de uso.
+- No passo 3, o vendedor pode cancelar a sequência de eventos, pulando para o passo 6 sem criar um lote de produtos.
+- No passo 5, caso o vendedor não confirme a criação do lote de produtos, ele pode retorna ao passo 3 para editá-los e/ou cancelar a sequência de eventos.
 
 **Exceções**:
 
-- No passo 4, caso seja confirmada a criação de um lote sem produtos, o sistema exibe uma mensagem de erro e o caso de uso se encerra.
+- No passo 2, caso o vendedor não esteja autenticado, desvia para o caso de uso de autenticação.
+- No passo 5, caso o vendedor confirme a criação de um lote sem produtos, uma mensagem de erro é exibida e o caso de uso se encerra.
 
 ### Realizar Leilão
 
@@ -62,26 +59,22 @@
 
 **Pré-condições**: 
 
-- Leiloeiro, compradores e vendedores autenticados.
+- Leiloeiro Autenticado.
 - Lotes cadastrados disponíveis no sistema.
 
 **Sequência de Eventos**:
 
 1. Leiloeiro solicita a inicialização de um Leilão.
-2. Sistema checa se existem lotes cadastrados disponíveis no sistema.
-3. Leiloeiro adiciona o lote desejado ao leilão.
-4. Leiloeiro finaliza a criação do Leilão.
-5. Sistema inicia o Leilão.
-6. Compradores fazem seus lances nos lotes.
-7. Sistema verifica se o lance é válido.
-8. Sistema atualiza o candidato ao lote com base nos novos lances.
-9. Sistema verifica o fim do leilão.
-10. Sistema define o lance vencedor para o lote.
-11. Sistema verifica se o lance vencedor supera o valor mínimo do lote.
-12. Sistema finaliza o leilão.
-13. Comprador paga o valor do seu lance somado a taxa de comissão.
-14. Leiloeiro registra o pagamento do lance vencedor no sistema. 
-15. Fim de Caso de Uso.
+2. Sistema checa se o Leiloeiro está autenticado.
+3. Sistema checa se existem lotes cadastrados disponíveis no sistema.
+4. Leiloeiro adiciona o lote desejado ao leilão.
+5. Leiloeiro finaliza a criação do Leilão.
+6. Sistema inicia o Leilão.
+7. Compradores fazem seus lances nos lotes.
+8. Leiloeiro, Compradores e Vendedores podem monitorar os lances e o horário de fim do Leilão.
+9. Quando o horário de fim do Leilão é atingido, o Sistema define o lance vencedor para o lote.
+10. Sistema finaliza o leilão.
+11. Fim de Caso de Uso.
 
 **Pós-Condições**:
 
@@ -89,19 +82,20 @@
 
 **Fluxos Alternativos**:
 
- - Entre o passo 5 e o passo 8, o vendedor pode cancelar o leilão a qualquer momento, pagando uma taxa e encerrando o caso de uso.
- - Entre o passo 5 e o passo 8, o leiloeiro, o vendedor e os compradores podem monitorar os lances e o horário de fim do Leilão.
- - Entre o passo 5 e o passo 8, o leiloeiro pode cancelar o leilão a qualquer momento, encerrando o caso de uso.
+ - No passo 7, caso o lance de um Comprador esteja abaixo do valor mínimo do lote, o Comprador é informado e retorna ao mesmo passo do fluxo principal para realizar outro lance.
+ - No passo 9, caso o lance vencedor esteja abaixo do valor mínimo do vendedor, o lote não é vendido e o Caso de Uso retorna ao fluxo principal.
+ - Entre o passo 5 e o passo 9, o Vendedor pode cancelar o leilão a qualquer momento, pagando uma taxa e fazendo o Caso de Uso avançar para o passo 10.
 
 **Exceções**:
 
- - No passo 3, caso não existam lotes cadastrados disponíveis no sistema, exibe uma mensagem informando a indisponibilidade de lotes e encerra o caso de uso.
+ - No passo 2, caso o Leiloeiro não esteja autenticado, desvia para o caso de uso de autenticação.
+ - No passo 3, caso não existam lotes cadastrados disponíveis no sistema, exibe uma mensagem informando que da indisponibilidade de lotes e encerra o caso de uso.
 
 ### Gerar Relatórios
 
 **Nome**: Gerar Relatórios.
 
-**Descrição**: Este caso de uso permite ao leiloeiro gerar um relatório de desempenho ou de faturamento contendo várias informações referentes ao leilão que acaba de ser completado.
+**Descrição**: Este caso de uso permite a geração de um relatório completo por meio do leiloeiro contendo várias informações referentes ao leilão que acaba de ser completado.
 
 **Evento Iniciador**: Leiloeiro solicita a geração do relatório.
 
@@ -112,15 +106,16 @@
 **Pré-condições**: 
 
 - Leiloeiro Autenticado
-- Leilão Finalizado com Lote Vendido
+- Leilão Finalizado com Sucesso
 
 **Sequência de Eventos**:
 
 1. Leiloeiro solicita a geração do relatório
-2. Leiloeiro informa que deseja obter um relatório de desempenho.
-3. Sistema agrega as informações do desempenho do leilão em um documento.
-4. Sistema apresenta este documento ao Leiloeiro.
-5. Fim de Caso de Uso.
+2. Sistema confirma se o Leiloeiro está autenticado.
+3. Sistema confirma se o Leilão foi finalizado com sucesso.
+4. Sistema agrega as informações do Leilão em um documento.
+5. Sistema apresenta este documento ao Leiloeiro.
+6. Fim de Caso de Uso.
 
 **Pós-Condições**:
 
@@ -128,9 +123,9 @@
 
 **Fluxos Alternativos**:
 
- - No passo 2, o leiloeiro pode informar que deseja obter um relatório de faturamento, alterando o fluxo para que o sistema agregue as informações para gerar este tipo de relatório.
- - No passo 5, o leiloeiro pode escolher baixar o documento e é desviado para a seção Baixar Relatório.
+ - No passo 5, o Leiloeiro pode escolher baixar o documento e é desviado para a seção Baixar Relatório.
 
 **Exceções**:
 
- - No passo 3, caso o sistema não encontre dados suficientes do leilão para gerar um relatório, exibe uma mensagem de erro e encerra o caso de uso.
+ - No passo 2, caso o Leiloeiro não esteja autenticado, desvia para o caso de uso de autenticação.
+ - No passo 3, caso o Leilão não tenha sido finalizado ainda, exibe uma mensagem informando que o Leilão não acabou e encerra o caso de uso.
