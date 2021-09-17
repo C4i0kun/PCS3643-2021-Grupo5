@@ -11,3 +11,4 @@
 
  - **[Aula1 - Workshop de Requisitos](Aula1)**
  - **[Aula2 - Especificação Casos de Uso](Aula2)**
+ - **[Aula 3 - Modelo de Análise e Gerência de Configuração](Aula3)**
