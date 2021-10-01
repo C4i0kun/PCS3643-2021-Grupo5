@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2><a href="{% url 'catalogo:lista_lote_leilao' %}">Lotes disponíveis</a></h2>
+
+<ul>
+    {% for lote in lista_de_lotes %}
+    <li>{{ lote.name }}  ({{ lote.valor_minimo_de_lote }} Valor)
+    <a href="{% url 'catalogo:atualiza_lote' lote.id %}">Editar</a>
+    <a href="{% url 'catalogo:deleta_lote' lote.id %}">Deletar</a>
+    </li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'catalogo:cria_lote' %}">Novo lote</a>
+
+
+<h2><a href="{% url 'catalogo:lista_lote_leilao' %}">Leilões Ativos</a></h2> 
+
+<ul>
+    {% for leilao in lista_de_leiloes %}
+    <li>{{ leilao.name }}  ({{ leilao.valor_minimo_de_lance }} Valor mínimo de lance)
+    <a href="{% url 'catalogo:atualiza_leilao' leilao.id %}">Editar</a>
+    <a href="{% url 'catalogo:deleta_leilao' leilao.id %}">Deletar</a>
+    </li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'catalogo:cria_leilao' %}">Novo Leilão</a>
+
+{% endblock %}

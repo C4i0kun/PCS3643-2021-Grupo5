@@ -18,3 +18,15 @@ class Lote(models.Model):
 
     def get_absolute_url(self):
         return reverse('catalogo:atualiza_lote', kwargs={'pk': self.pk})
+
+class Leilao(models.Model):
+    name = models.CharField(max_length=200)
+    periodoInicio = models.DateTimeField()
+    periodoFinal = models.DateTimeField()
+    valor_minimo_de_lance = models.FloatField()
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('catalogo:atualiza_leilao', kwargs={'pk': self.pk})
