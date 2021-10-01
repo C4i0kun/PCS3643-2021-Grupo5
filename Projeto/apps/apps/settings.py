@@ -39,9 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'theme',
-    'catalogo',
-    'books_fbv',
-    'books_fbv_user',    
+    'catalogo',  
 ]
 
 MIDDLEWARE = [
