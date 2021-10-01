@@ -13,3 +13,4 @@
  - **[Aula2 - Especificação Casos de Uso](Aula2)**
  - **[Aula 3 - Modelo de Análise e Gerência de Configuração](Aula3)**
  - **[Aula 4 - Plano de Testes de Validação](Aula4)**
+ - **[Aula 5 - Modelo de Projeto e Padrões Arquiteturais](Aula5)**
