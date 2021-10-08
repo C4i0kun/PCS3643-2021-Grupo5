@@ -14,3 +14,4 @@
  - **[Aula 3 - Modelo de Análise e Gerência de Configuração](Aula3)**
  - **[Aula 4 - Plano de Testes de Validação](Aula4)**
  - **[Aula 5 - Modelo de Projeto e Padrões Arquiteturais](Aula5)**
+ - **[Aula 6 - Padrões de Projeto e Mapeamento O-R](Aula6)**
