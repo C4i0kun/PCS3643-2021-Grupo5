@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-
+from ..models import Leilao, Lote
 
 class Migration(migrations.Migration):
 
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('valor_minimo_de_lote', models.FloatField()),
                 ('valor_minimo_de_reserva', models.FloatField()),
                 ('valor_minimo_por_lance', models.FloatField()),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('vendedor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
@@ -36,7 +36,30 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=200)),
                 ('periodoInicio', models.DateTimeField()),
                 ('periodoFinal', models.DateTimeField()),
-                ('valor_minimo_de_lance', models.FloatField()),
+                ('lote', models.OneToOneField(to='Lote', on_delete=models.CASCADE))
+            ],
+        ),
+        migrations.CreateModel(
+            name='Lance',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('valor', models.FloatField()),
+                ('comprador', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('leilao', models.ForeignKey(to='Leilao', on_delete=models.CASCADE))
+            ],
+        ),
+        migrations.CreateModel(
+            name='Vendedor',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=200)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Comprador',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=200)),
             ],
         ),
     ]
