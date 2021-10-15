@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2><a href="{% url 'catalogo:lista_lote' %}">Lotes disponíveis</a></h2>
+
+<ul>
+    {% for lote in lista_de_lotes_disponiveis %}
+    <li>{{ lote.name }}  ({{ lote.valor_minimo_de_lote }} Valor)
+    <a href="{% url 'catalogo:detalha_lote' lote.id %}">Ver Detalhes</a>
+    </li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'catalogo:cria_lote' %}">Novo lote</a>
+
+{% endblock %}

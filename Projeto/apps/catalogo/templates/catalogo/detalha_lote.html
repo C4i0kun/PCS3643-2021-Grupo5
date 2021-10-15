@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2><a href="{% url 'catalogo:detalha_lote' lote.id %}">Lote {{ lote.name }}</a></h2>
+
+<div class="detalha-lote">
+    <ul>
+        <li>Nome: {{ lote.name }}</li>
+        <li>Número Sequencial: {{ lote.numero_sequencial }}</li>
+        <li>Valor: R$ {{ lote.valor_minimo_de_lote }}</li>
+        <li>Valor mínimo de reserva: R$ {{ lote.valor_minimo_de_reserva }}</li>
+        <li>Valor mínimo por lance: R$ {{ lote.valor_minimo_por_lance }}</li>
+        <li>Descrição:{{ lote.descricao }}</li>
+        <li>Estado:{{ lote.estado }}</li>
+        <li>Taxa de Comissão:{{ lote.taxa_de_comissao }}</li>
+    
+    </ul>
+
+    <div class="detalha-lote-botoes">
+        <div class="detalha-lote-botao-lateral">
+            <a href="{% url 'catalogo:cria_leilao' lote.id %}"><p class="small-button">Cria Leilão</p></a>
+        </div>
+        <div class="detalha-lote-botao-central">
+            <a href="{% url 'catalogo:atualiza_lote' lote.id %}"><p class="small-button">Editar</p></a>
+        </div>
+        <div class="detalha-lote-botao-lateral">
+            <a href="{% url 'catalogo:deleta_lote' lote.id %}"><p class="small-button">Deletar</p></a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

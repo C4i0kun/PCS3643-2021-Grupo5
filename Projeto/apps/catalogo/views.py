@@ -20,28 +20,54 @@ class LeilaoForm(ModelForm):
 class LanceForm(ModelForm):
     class Meta:
         model = Lance
-        fields = ['valor']  
+        fields = ['valor']
 
 # funções dos lotes
 @login_required
-def lista_lote_leilao(request, template_name='catalogo/lista_lote_leilao.html'):
+def principal(request, template_name='catalogo/principal.html'):
+    
+    leiloes = Leilao.objects.all()
+    lances = Lance.objects.all()
+
+    data = {}
+    data['lista_de_leiloes'] = leiloes
+
+    # Pegar maior lance depois
+
+    return render(request, template_name, data)
+
+# funções dos lotes
+@login_required
+def lista_lote(request, template_name='catalogo/lista_lote.html'):
     if request.user.is_superuser:
         lotes = Lote.objects.all()
     else:
         lotes = Lote.objects.filter(vendedor=request.user)
 
-    leiloes = Leilao.objects.all()
-    lances = Lance.objects.all()
+    # leiloes = Leilao.objects.all()
+    # lances = Lance.objects.all()
 
     data = {}
     data['lista_de_lotes'] = lotes
-    data['lista_de_leiloes'] = leiloes
-    data['lista_de_lances'] = lances
+    # data['lista_de_leiloes'] = leiloes
+    # data['lista_de_lances'] = lances
 
     data['lista_de_lotes_disponiveis'] = []
     for lote in lotes:
         if not Leilao.objects.filter(lote = lote):
             data['lista_de_lotes_disponiveis'].append(lote)
+
+    return render(request, template_name, data)
+
+@login_required
+def detalha_lote(request, pk, template_name='catalogo/detalha_lote.html'):
+    if request.user.is_superuser:
+        lote= get_object_or_404(Lote, pk=pk)
+    else:
+        lote= get_object_or_404(Lote, pk=pk, vendedor=request.user)
+
+    data = {}
+    data['lote'] = lote
 
     return render(request, template_name, data)
 
@@ -52,7 +78,7 @@ def cria_lote(request, template_name='catalogo/lote_form.html'):
         lote = form.save(commit=False)
         lote.vendedor = request.user
         lote.save()
-        return redirect('catalogo:lista_lote_leilao')
+        return redirect('catalogo:detalha_lote', pk=lote.id)
     return render(request, template_name, {'form':form})
 
 @login_required
@@ -64,7 +90,7 @@ def atualiza_lote(request, pk, template_name='catalogo/lote_form.html'):
     form = LoteForm(request.POST or None, instance=lote)
     if form.is_valid():
         form.save()
-        return redirect('catalogo:lista_lote_leilao')
+        return redirect('catalogo:detalha_lote', pk=pk)
     return render(request, template_name, {'form':form})
 
 @login_required
@@ -75,19 +101,20 @@ def deleta_lote(request, pk, template_name='catalogo/lote_confirma_delecao.html'
         lote= get_object_or_404(Lote, pk=pk, vendedor=request.user)
     if request.method=='POST':
         lote.delete()
-        return redirect('catalogo:lista_lote_leilao')
+        return redirect('catalogo:lista_lote')
     return render(request, template_name, {'object':lote})
 
 # funções dos leilões
-# @login_required
-# def lista_leilao(request, template_name='catalogo/lista_lote_leilao.html'):
-#     if request.user.is_superuser:
-#         leilao = Leilao.objects.all()
-#     else:
-#         leilao = Leilao.objects.filter(user=request.user)
-#     data = {}
-#     data['lista_de_leiloes'] = leilao
-#     return render(request, template_name, data)
+@login_required
+def lista_leilao(request, template_name='catalogo/lista_leilao.html'):
+    leiloes = Leilao.objects.all()
+    lances = Lance.objects.all()
+
+    data = {}
+    data['lista_de_leiloes'] = leiloes
+    data['lista_de_lances'] = sorted(lances, key=lambda t: t.valor, reverse=True)
+
+    return render(request, template_name, data)
 
 @login_required
 def cria_leilao(request, id_lote, template_name='catalogo/leilao_form.html'):
@@ -97,8 +124,19 @@ def cria_leilao(request, id_lote, template_name='catalogo/leilao_form.html'):
         lote = get_object_or_404(Lote, pk=id_lote)
         leilao.lote = lote
         leilao.save()
-        return redirect('catalogo:lista_lote_leilao')
+        return redirect('catalogo:detalha_leilao', pk=leilao.id)
     return render(request, template_name, {'form':form})
+
+@login_required
+def detalha_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
+    leilao= get_object_or_404(Leilao, pk=pk)
+    lances = Lance.objects.all()
+
+    data = {}
+    data['leilao'] = leilao
+    data['lista_de_lances'] = sorted(lances, key=lambda t: t.valor, reverse=True)
+
+    return render(request, template_name, data)
 
 @login_required
 def atualiza_leilao(request, pk, template_name='catalogo/leilao_form.html'):
@@ -107,7 +145,7 @@ def atualiza_leilao(request, pk, template_name='catalogo/leilao_form.html'):
     form = LeilaoForm(request.POST or None, instance=leilao)
     if form.is_valid():
         form.save()
-        return redirect('catalogo:lista_lote_leilao')
+        return redirect('catalogo:detalha_leilao', pk=pk)
     return render(request, template_name, {'form':form})
 
 @login_required
@@ -116,7 +154,7 @@ def deleta_leilao(request, pk, template_name='catalogo/leilao_confirma_delecao.h
     
     if request.method=='POST':
         leilao.delete()
-        return redirect('catalogo:lista_lote_leilao')
+        return redirect('catalogo:lista_leilao')
     return render(request, template_name, {'object':leilao})
 
 @login_required
@@ -128,5 +166,5 @@ def faz_lance(request, id_leilao, template_name='catalogo/lance_form.html'):
         lance.leilao = leilao
         lance.comprador = request.user
         lance.save()
-        return redirect('catalogo:lista_lote_leilao')
+        return redirect('catalogo:detalha_leilao', pk=id_leilao)
     return render(request, template_name, {'form':form})

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<a href="{% url 'catalogo:lista_lote' %}"><p class="button">Ver seus Lotes</p></a>
+
+
+
+<p class="button"><a href="{% url 'catalogo:lista_leilao' %}">Ver Leilões Ativos</a></p>
+
+<h3>Alguns Leilões Ativos:</h3>
+<ul class="items">
+    {% for leilao in lista_de_leiloes %}
+    <a href="{% url 'catalogo:detalha_leilao' leilao.id %}">
+    <li class="item"><h4>{{ leilao.name }}</h4>
+
+    <br/>
+
+    <ul>
+        <li>Lote: {{leilao.lote.name}}</li>
+        <li>Descrição: {{leilao.lote.descricao}}</li>
+    </ul>
+    </li>
+    </a>
+    {% endfor %}
+</ul>
+
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="titulo-leilao"><a href="{% url 'catalogo:detalha_leilao' leilao.id %}">{{ leilao.name }}</a></h2>
+
+<h5 class="periodo">{{ leilao.periodoInicio }} - {{ leilao.periodoFinal }}</h5>
+
+<div class="detalha-lote">
+    <ul>
+        <li>Nome: {{ leilao.lote.name }}</li>
+        <li>Número Sequencial: {{ leilao.lote.numero_sequencial }}</li>
+        <li>Valor: R$ {{ leilao.lote.valor_minimo_de_lote }}</li>
+        <li>Valor mínimo de reserva: R$ {{ leilao.lote.valor_minimo_de_reserva }}</li>
+        <li>Valor mínimo por lance: R$ {{ leilao.lote.valor_minimo_por_lance }}</li>
+        <li>Descrição:{{ leilao.lote.descricao }}</li>
+        <li>Estado:{{ leilao.lote.estado }}</li>
+        <li>Taxa de Comissão:{{ leilao.lote.taxa_de_comissao }}</li>
+
+        <br/>
+        
+        <h3>Lances:</h3>
+        {% for lance in lista_de_lances %}
+        {% if lance.leilao.id == leilao.id %}
+        <li>Valor: {{ lance.valor }} - Comprador: {{ lance.comprador.username }}
+
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+    
+    <div class="detalha-lote-botoes">
+        <div class="detalha-lote-botao-lateral">
+            <a href="{% url 'catalogo:faz_lance' leilao.id %}"><p class="small-button">Fazer Lance</p></a>
+        </div>
+        <div class="detalha-lote-botao-central">
+            <a href="{% url 'catalogo:atualiza_leilao' leilao.id %}"><p class="small-button">Editar</p></a>
+        </div>
+        <div class="detalha-lote-botao-lateral">
+            <a href="{% url 'catalogo:deleta_leilao' leilao.id %}"><p class="small-button">Deletar</p></a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

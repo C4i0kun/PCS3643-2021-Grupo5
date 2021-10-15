@@ -8,34 +8,34 @@
 
 {% if next %}
     {% if user.is_authenticated %}
-    <p>Sua conta não tem acesso a esta página. Para continuar, faça login com uma conta que tenha acesso.</p>
+    <p class="login-warning">Sua conta não tem acesso a esta página. Para continuar, faça login com uma conta que tenha acesso.</p>
     {% else %}
-    <p>Por favor, faça o login para ver esta página.</p>
+    <p class="login-warning">Por favor, faça o login para ver esta página.</p>
     {% endif %}
 {% endif %}
-<div id = "user"> 
-        <!--formulario de login-->
-        <form method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        
-        <table>
-        <tr><!--usuario-->
-            <td id= "tcolor">{{ form.username.label_tag }}</td>
-            <td>{{ form.username }}</td>
-        </tr>
-        <tr><!--senha-->
-            <td id="tcolor">{{ form.password.label_tag }}</td>
-            <td>{{ form.password }}</td>
-        </tr>
-        </table>
+<div class = "login-panel"> 
+    <h2>Acesse sua conta</h2>
 
-        <input type="submit" value="login">
-        <input type="hidden" name="next" value="{{ next }}">
-        </form>
+    <!--formulario de login-->
+    <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    
+    <table>
+    <tr><!--usuario-->
+        <p class="login-text">{{ form.username.label_tag }} {{ form.username }}</p>
+    </tr>
+    <tr><!--senha-->
+        <p class="login-text">{{ form.password.label_tag }} {{ form.password }}</p>
+    </tr>
+    </table>
+
+    <p class="login-forms"><input type="submit" value="login"></p>
+    <input type="hidden" name="next" value="{{ next }}">
+    </form>
 
 {# Presume que você configurou a vista password_reset em seu URLconf #}
 <!--<p><a href="{% url 'password_reset' %}">Senha perdida?</a></p>-->
 
-<p><a href="#">Senha perdida?</a></p>
+<p class="login-lost"><a href="#">Senha perdida?</a></p>
 </div>
 {% endblock %}

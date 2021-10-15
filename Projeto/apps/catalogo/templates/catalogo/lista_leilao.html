@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2><a href="{% url 'catalogo:lista_leilao' %}">Leilões Ativos</a></h2> 
+
+<ul>
+    {% for leilao in lista_de_leiloes %}
+    <li>{{ leilao.name }}
+    <a href="{% url 'catalogo:detalha_leilao' leilao.id %}">Ver Detalhes</a>
+    <ul>
+        <li>Lote: {{leilao.lote.name}}</li>
+        <li>Descrição: {{leilao.lote.descricao}}</li>
+    </ul>
+    <ul>
+        <li>Lance Vencedor:</li>
+        <ul>
+            {% for lance in lista_de_lances %}
+            {% if lance.leilao.id == leilao.id %}
+            <li>Valor: {{ lance.valor }} - Comprador: {{ lance.comprador.username }}
+
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </ul>
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

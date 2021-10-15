@@ -1,19 +1,27 @@
- body {
-    font-family: Arial, Helvetica, sans-serif;
-    width:800px;
+body {
     margin:auto;
-    ;
 }
+
 p,li,label, #tcolor{
-    color: rgb(11, 58, 52);
+    color: #363636;
 }
+
 a { 
-    color:rgb(0, 0, 0);
+    color:#363636;
     text-decoration:none;
 }
 
+a.header, a.logout { 
+    color: #ffffff;
+    text-decoration:none;
+}
+
+a.logout {
+    font-weight: bold;
+}
+
 a:hover {  
-    text-decoration:underline;
+    text-decoration: underline;
 }
 
 #user {
@@ -21,10 +29,279 @@ a:hover {
     color: rgb(11, 58, 52); 
 }
 
+#header-bg {
+    background-image: linear-gradient(#f6402d, #ff7f35);
+}
+
 body {
-    background: url(../images/wallpaper.jpg); 
-    background-size: cover;
-    background-repeat: no-repeat;
-    margin: 50;
-    height: 100vh;
+    background-image: url("../images/wallpaper.jpg"); 
+    margin: 0;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    border: 0;
+    padding: 0;
+    background-color: #ffffff;
   }
+
+/*
+    Subtitles
+*/
+
+h1 {
+    width: 100%;
+    padding: 1%;
+    margin-top: 0;
+    text-align: center;
+    font-size: 50px;
+    font-weight: normal;
+    /* font-style: normal; */
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    color: #ffffff;
+}
+
+h2 {
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    color: #363636;
+    margin-bottom: 50px;
+}
+
+h3 {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    margin: 0;
+    color: #363636;
+}
+
+p {
+    font-family: Helvetica, Arial, sans-serif;
+    color: #363636
+}
+
+/*
+    Nav bar
+*/
+nav {
+    box-sizing: border-box;
+    width: 100%;
+    font-size: 17px;
+    text-align: right;
+    font-family: Helvetica, Arial, sans-serif;
+    /* background-color: #dbdbdb; */
+    border: 0;
+    Padding: 5px;
+    margin: 0;
+    color: #ffffff;
+}
+
+/*
+    Home login banner
+*/
+
+p.login-banner {
+    text-align: center;
+}
+
+/*
+    Login Style
+*/
+
+p.login-warning {
+    color: #800808;
+    text-align: center;
+}
+
+div.login-panel {
+    padding-top: 5%;
+    padding-bottom: 5%;
+    width: 60%;
+    height: auto;
+    margin: auto;
+    background-color: #e7e7e7;
+    border-radius: 20px;
+}
+
+p.login-text {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+p.login-forms {
+    text-align: center;
+}
+
+p.login-lost {
+    font-size: 17px;
+    text-align: right;
+    text-align: center;
+}
+
+input[type=text], input[type=password], input[type=number]  {
+    width: 50%;
+    font-size: 20px;
+    text-align: center;
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #c1c1c1;
+    border: 0;
+    Padding: 5px;
+    border-radius: 5px;
+    color: #363636;
+}
+
+input[type=submit] {
+    width: 40%;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #C1C1C1;
+    border: 0;
+    margin: 10px;
+    Padding: 10px;
+    border-radius: 5px;
+    color: #363636;
+}
+
+input[type=submit]:hover {
+    background-color: #9e9e9e;
+}
+
+/*
+    generic style
+*/
+div.main-content {
+    max-width: 1000px;
+    margin: auto;
+}
+
+div.header {
+    width: 100%;
+    border: 0;
+    margin: 0;
+    padding: 5px;
+    background-color: #dbdbdb;
+    position: sticky;
+}
+
+div.logout {
+    font-size: 17px;
+    text-align: right;
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #dbdbdb;
+    border: 0;
+    Padding: 5px;
+    color: #363636;
+}
+
+div.title {
+    font-size: 20px;
+    text-align: right;
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #dbdbdb;
+    border: 0;
+    Padding: 5px;
+    border-radius: 5px;
+    color: #363636;
+}
+
+p.button {
+    width: 20%;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #C1C1C1;
+    border: 0;
+    margin: auto;
+    margin-bottom: 5%;
+    margin-top: 5%;
+    Padding: 12px;
+    border-radius: 5px;
+    color: #363636;
+}
+
+p.small-button {
+    width: 100%;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #C1C1C1;
+    border: 3;
+    margin: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 5px;
+    color: #363636;
+}
+
+ul.items{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+li.item{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 0 5px black;
+    width: 200px;
+    border: 10px;
+    margin: 30px;
+}
+/*
+    detalha lotes
+*/
+
+div.detalha-lote {
+    padding-top: 0.5%;
+    width: 60%;
+    height: auto;
+    margin: auto;
+    background-color: #e7e7e7;
+    border-radius: 20px;
+    box-sizing: border-box;
+}
+
+div.detalha-lote-botoes {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+}
+
+div.detalha-lote-botao-lateral {
+    box-sizing: border-box;
+    flex-grow: 1;
+}
+
+div.detalha-lote-botao-central {
+    margin-left: 2px;
+    margin-right: 2px;
+    box-sizing: border-box;
+    flex-grow: 1;
+}
+
+/*
+    detalha leilão
+*/
+
+h2.titulo-leilao {
+    margin-bottom: 2px;
+}
+
+h5.periodo {
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 50px;
+}
