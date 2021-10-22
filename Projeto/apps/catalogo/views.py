@@ -53,33 +53,53 @@ class LeilaoForm(ModelForm):
         model = Leilao
         fields = ['name', 'periodoInicio', 'periodoFinal']  
 
-    # def clean_periodoInicio(self):
-    #     periodoInicio = self.cleaned_data['periodoInicio']
-    #     periodoFinal = self.data['periodoFinal']
+    def clean_periodoInicio(self):
+        periodoInicio = self.cleaned_data['periodoInicio']
+        periodoFinal = self.data['periodoFinal']
 
-    #     # Checa se o início do período é posterior ao horário atual.
-    #     if periodoInicio.replace(tzinfo=utc) < datetime.now(timezone.utc):
-    #         raise ValidationError(_('Início do período do leilão deve ser posterior ao horário atual.'))
+        if type(periodoInicio) == str:
+            periodoInicio_dt = datetime.strptime(periodoInicio, '%Y-%m-%d %H:%M:%S')
+        else:
+            periodoInicio_dt = periodoInicio
+        
+        if type(periodoFinal) == str:
+            periodoFinal_dt = datetime.strptime(periodoFinal, '%Y-%m-%d %H:%M:%S')
+        else:
+            periodoFinal_dt = periodoFinal
 
-    #     # Checa se o início do período é anterior ao final do período.
-    #     if periodoInicio.replace(tzinfo=utc) >= periodoFinal.replace(tzinfo=utc):
-    #         raise ValidationError(_('Início do período do leilão deve ser anterior ao final do período do leilão.'))
+        # Checa se o início do período é posterior ao horário atual.
+        if periodoInicio_dt.replace(tzinfo=utc) < datetime.now(timezone.utc):
+            raise ValidationError(_('Início do período do leilão deve ser posterior ao horário atual.'))
 
-    #     return periodoInicio
+        # Checa se o início do período é anterior ao final do período.
+        if periodoInicio_dt.replace(tzinfo=utc) >= periodoFinal_dt.replace(tzinfo=utc):
+            raise ValidationError(_('Início do período do leilão deve ser anterior ao final do período do leilão.'))
 
-    # def clean_periodoFinal(self):
-    #     periodoInicio = self.data['periodoInicio']
-    #     periodoFinal = self.cleaned_data['periodoFinal']
+        return periodoInicio
 
-    #     # Checa se o início do período é posterior ao horário atual.
-    #     if periodoFinal.replace(tzinfo=utc) < datetime.now(timezone.utc) + timedelta(days=1):
-    #         raise ValidationError(_('Final do período do leilão deve ser posterior ao horário atual mais um dia.'))
+    def clean_periodoFinal(self):
+        periodoInicio = self.data['periodoInicio']
+        periodoFinal = self.cleaned_data['periodoFinal']
 
-    #     # Checa se o início do período é anterior ao final do período.
-    #     if periodoFinal.replace(tzinfo=utc) < periodoInicio.replace(tzinfo=utc) + timedelta(days=1):
-    #         raise ValidationError(_('Final do período do leilão deve ser posterior ao início do período do leilão mais um dia.'))
+        if type(periodoInicio) == str:
+            periodoInicio_dt = datetime.strptime(periodoInicio, '%Y-%m-%d %H:%M:%S')
+        else:
+            periodoInicio_dt = periodoInicio
+        
+        if type(periodoFinal) == str:
+            periodoFinal_dt = datetime.strptime(periodoFinal, '%Y-%m-%d %H:%M:%S')
+        else:
+            periodoFinal_dt = periodoFinal
 
-    #     return periodoFinal
+        # Checa se o início do período é posterior ao horário atual.
+        if periodoFinal_dt.replace(tzinfo=utc) < datetime.now(timezone.utc) + timedelta(days=1):
+            raise ValidationError(_('Final do período do leilão deve ser posterior ao horário atual mais um dia.'))
+
+        # Checa se o início do período é anterior ao final do período.
+        if periodoFinal_dt.replace(tzinfo=utc) < periodoInicio_dt.replace(tzinfo=utc) + timedelta(days=1):
+            raise ValidationError(_('Final do período do leilão deve ser posterior ao início do período do leilão mais um dia.'))
+
+        return periodoFinal
 
 class LanceForm(ModelForm):
     class Meta:

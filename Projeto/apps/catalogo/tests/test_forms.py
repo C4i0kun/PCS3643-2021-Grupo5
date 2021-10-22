@@ -24,64 +24,64 @@ class LanceFormTest(TestCase):
             form.fields['valor'].label is None or
             form.fields['valor'].label == 'Valor')
 
-# class LeilaoFormTest(TestCase):
+class LeilaoFormTest(TestCase):
 
-#     def test_periodoInicio_anterior_ao_horario_atual(self):
-#         """Testa se o form é inválido caso o início do periódo do leilão for no passado."""
-#         form = LeilaoForm(data={
-#             'name' : 'Teste',
-#             'periodoInicio': datetime.now() - timedelta(hours=1),
-#             'periodoFinal': datetime.now() + timedelta(days=1)})
-#         self.assertFalse(form.is_valid())
+    def test_periodoInicio_anterior_ao_horario_atual(self):
+        """Testa se o form é inválido caso o início do periódo do leilão for no passado."""
+        form = LeilaoForm(data={
+            'name' : 'Teste',
+            'periodoInicio': datetime.now() - timedelta(hours=1),
+            'periodoFinal': datetime.now() + timedelta(days=1)})
+        self.assertFalse(form.is_valid())
 
-#     def test_periodoInicio_apos_periodoFinal(self):
-#         """Testa se o form é inválido caso o início do período seja posterior ao seu fim."""
-#         form = LeilaoForm(data={
-#             'name' : 'Teste',
-#             'periodoInicio': datetime.now() + timedelta(days=2),
-#             'periodoFinal': datetime.now() + timedelta(days=1)})
-#         self.assertFalse(form.is_valid())
+    def test_periodoInicio_apos_periodoFinal(self):
+        """Testa se o form é inválido caso o início do período seja posterior ao seu fim."""
+        form = LeilaoForm(data={
+            'name' : 'Teste',
+            'periodoInicio': datetime.now() + timedelta(days=2),
+            'periodoFinal': datetime.now() + timedelta(days=1)})
+        self.assertFalse(form.is_valid())
 
-#     def test_periodoInicio_valido(self):
-#         """Testa se um período de início é válido."""
-#         form = LeilaoForm(data={
-#             'name' : 'Teste',
-#             'periodoInicio': datetime.now() + timedelta(hours=1),
-#             'periodoFinal': datetime.now() + timedelta(days=3)})
-#         self.assertTrue(form.is_valid())
+    def test_periodoInicio_valido(self):
+        """Testa se um período de início é válido."""
+        form = LeilaoForm(data={
+            'name' : 'Teste',
+            'periodoInicio': datetime.now() + timedelta(hours=1),
+            'periodoFinal': datetime.now() + timedelta(days=3)})
+        self.assertTrue(form.is_valid())
 
-#     def test_periodoFinal_anterior_ao_horario_atual(self):
-#         """Testa se o form é inválido caso o fim do período do leilão for no passado."""
-#         form = LeilaoForm(data={
-#             'name' : 'Teste',
-#             'periodoInicio': datetime.now(),
-#             'periodoFinal': datetime.now() - timedelta(days=1)})
-#         self.assertFalse(form.is_valid())
+    def test_periodoFinal_anterior_ao_horario_atual(self):
+        """Testa se o form é inválido caso o fim do período do leilão for no passado."""
+        form = LeilaoForm(data={
+            'name' : 'Teste',
+            'periodoInicio': datetime.now(),
+            'periodoFinal': datetime.now() - timedelta(days=1)})
+        self.assertFalse(form.is_valid())
 
-#     def test_periodoFinal_anterior_ao_horario_atual_mais_um_dia(self):
-#         """Testa se o form é inválido caso o fim do período seja anterior ao horário atual mais um dia."""
-#         form = LeilaoForm(data={
-#             'name' : 'Teste',
-#             'periodoInicio': datetime.now(),
-#             'periodoFinal': datetime.now() + timedelta(hours=18)})
-#         self.assertFalse(form.is_valid())
+    def test_periodoFinal_anterior_ao_horario_atual_mais_um_dia(self):
+        """Testa se o form é inválido caso o fim do período seja anterior ao horário atual mais um dia."""
+        form = LeilaoForm(data={
+            'name' : 'Teste',
+            'periodoInicio': datetime.now(),
+            'periodoFinal': datetime.now() + timedelta(hours=18)})
+        self.assertFalse(form.is_valid())
 
-#     def test_periodoFinal_anterior_ao_periodoInicio_mais_um_dia(self):
-#         """Testa se o form é inválido caso o fim do período seja anterior ao seu início mais um dia."""
-#         form = LeilaoForm(data={
-#             'name' : 'Teste',
-#             'periodoInicio': datetime.now() + timedelta(days=2),
-#             'periodoFinal': datetime.now() + timedelta(days=1)})
-#         self.assertFalse(form.is_valid())
+    def test_periodoFinal_anterior_ao_periodoInicio_mais_um_dia(self):
+        """Testa se o form é inválido caso o fim do período seja anterior ao seu início mais um dia."""
+        form = LeilaoForm(data={
+            'name' : 'Teste',
+            'periodoInicio': datetime.now() + timedelta(days=2),
+            'periodoFinal': datetime.now() + timedelta(days=1)})
+        self.assertFalse(form.is_valid())
 
 
-#     def test_periodoFinal_valido(self):
-#         """Testa se um período final é válido."""
-#         form = LeilaoForm(data={
-#             'name' : 'Teste',
-#             'periodoInicio': datetime.now() + timedelta(hours=1),
-#             'periodoFinal': datetime.now() + timedelta(days=3)})
-#         self.assertTrue(form.is_valid())
+    def test_periodoFinal_valido(self):
+        """Testa se um período final é válido."""
+        form = LeilaoForm(data={
+            'name' : 'Teste',
+            'periodoInicio': datetime.now() + timedelta(hours=1),
+            'periodoFinal': datetime.now() + timedelta(days=3)})
+        self.assertTrue(form.is_valid())
 
 class LoteFormTest(TestCase):
 
