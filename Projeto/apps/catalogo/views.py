@@ -1,6 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.exceptions import ValidationError
+from django.utils.timezone import utc
+from django.utils.translation import ugettext_lazy as _
 from django.forms import ModelForm
+
+from datetime import datetime, timezone, timedelta
 
 from .models import Lote, Leilao, Lance
 
@@ -8,19 +13,87 @@ from .models import Lote, Leilao, Lance
 class LoteForm(ModelForm):
     class Meta:
         model = Lote
-        fields = ['name', 'numero_sequencial', 'descricao', 'estado', 
-                  'taxa_de_comissao', 'valor_minimo_de_lote',
-                  'valor_minimo_de_reserva', 'valor_minimo_por_lance']
+        fields = ['name', 'descricao', 'estado', 
+                  'valor_minimo_de_lote', 'valor_minimo_de_reserva', 'valor_minimo_por_lance']
+
+    def clean_valor_minimo_de_lote(self):
+        valor_minimo_de_lote = self.cleaned_data['valor_minimo_de_lote']
+
+        # Checa se o valor mínimo do lote é superior a zero.
+        if float(valor_minimo_de_lote) <= 0:
+            raise ValidationError(_('Valor mínimo do lote deve ser superior a 0.'))
+
+        return valor_minimo_de_lote
+     
+    def clean_valor_minimo_de_reserva(self):
+        valor_minimo_de_lote = self.data['valor_minimo_de_lote']
+        valor_minimo_de_reserva = self.cleaned_data['valor_minimo_de_reserva']
+
+        # Checa se o valor mínimo de reserva é superior a zero.
+        if float(valor_minimo_de_reserva) <= 0:
+            raise ValidationError(_('Valor mínimo de reserva deve ser superior a 0.'))
+
+        # Checa se o valor mínimo de reserva é superior ao valor mínimo de lote.
+        if float(valor_minimo_de_reserva) <= float(valor_minimo_de_lote):
+            raise ValidationError(_('Valor mínimo de reserva deve ser superior ao valor mínimo do lote.'))
+
+        return valor_minimo_de_reserva
+    
+    def clean_valor_minimo_por_lance(self):
+        valor_minimo_por_lance = self.cleaned_data['valor_minimo_por_lance']
+
+        # Checa se o valor mínimo por lance é superior a zero.
+        if float(valor_minimo_por_lance) <= 0:
+            raise ValidationError(_('Valor mínimo por lance deve ser superior a 0.'))
+
+        return valor_minimo_por_lance
 
 class LeilaoForm(ModelForm):
     class Meta:
         model = Leilao
         fields = ['name', 'periodoInicio', 'periodoFinal']  
 
+    # def clean_periodoInicio(self):
+    #     periodoInicio = self.cleaned_data['periodoInicio']
+    #     periodoFinal = self.data['periodoFinal']
+
+    #     # Checa se o início do período é posterior ao horário atual.
+    #     if periodoInicio.replace(tzinfo=utc) < datetime.now(timezone.utc):
+    #         raise ValidationError(_('Início do período do leilão deve ser posterior ao horário atual.'))
+
+    #     # Checa se o início do período é anterior ao final do período.
+    #     if periodoInicio.replace(tzinfo=utc) >= periodoFinal.replace(tzinfo=utc):
+    #         raise ValidationError(_('Início do período do leilão deve ser anterior ao final do período do leilão.'))
+
+    #     return periodoInicio
+
+    # def clean_periodoFinal(self):
+    #     periodoInicio = self.data['periodoInicio']
+    #     periodoFinal = self.cleaned_data['periodoFinal']
+
+    #     # Checa se o início do período é posterior ao horário atual.
+    #     if periodoFinal.replace(tzinfo=utc) < datetime.now(timezone.utc) + timedelta(days=1):
+    #         raise ValidationError(_('Final do período do leilão deve ser posterior ao horário atual mais um dia.'))
+
+    #     # Checa se o início do período é anterior ao final do período.
+    #     if periodoFinal.replace(tzinfo=utc) < periodoInicio.replace(tzinfo=utc) + timedelta(days=1):
+    #         raise ValidationError(_('Final do período do leilão deve ser posterior ao início do período do leilão mais um dia.'))
+
+    #     return periodoFinal
+
 class LanceForm(ModelForm):
     class Meta:
         model = Lance
         fields = ['valor']
+
+    def clean_valor(self):
+        valor = self.cleaned_data['valor']
+
+        # Checa se o valor é superior a zero.
+        if float(valor) <= 0:
+            raise ValidationError(_('Valor deve ser superior a 0.'))
+
+        return valor
 
 # funções dos lotes
 @login_required
@@ -77,6 +150,18 @@ def cria_lote(request, template_name='catalogo/lote_form.html'):
     if form.is_valid():
         lote = form.save(commit=False)
         lote.vendedor = request.user
+
+        if lote.valor_minimo_de_lote <= 1000:
+            lote.taxa_de_comissao = 1/100
+        elif lote.valor_minimo_de_lote <= 10000:
+            lote.taxa_de_comissao = 2/100
+        elif lote.valor_minimo_de_lote <= 50000:
+            lote.taxa_de_comissao = 3/100
+        elif lote.valor_minimo_de_lote <= 100000:
+            lote.taxa_de_comissao = 4/100
+        else:
+            lote.taxa_de_comissao = 5/100
+
         lote.save()
         return redirect('catalogo:detalha_lote', pk=lote.id)
     return render(request, template_name, {'form':form})

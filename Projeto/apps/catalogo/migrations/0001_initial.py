@@ -13,15 +13,20 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
+    ESTADO_CHOICES = (
+        ("N", "Novo"),
+        ("S", "Seminovo"),
+        ("U", "Usado")
+    )
+
     operations = [
         migrations.CreateModel(
             name='Lote',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=200)),
-                ('numero_sequencial', models.IntegerField()),
                 ('descricao', models.CharField(max_length=1000)),
-                ('estado', models.CharField(max_length=20)),
+                ('estado', models.CharField(max_length=1, choices=ESTADO_CHOICES, blank=False, null=False)),
                 ('taxa_de_comissao', models.FloatField()),
                 ('valor_minimo_de_lote', models.FloatField()),
                 ('valor_minimo_de_reserva', models.FloatField()),
@@ -52,14 +57,14 @@ class Migration(migrations.Migration):
             name='Vendedor',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
+                ('name', models.CharField(max_length=200, verbose_name='Nome')),
             ],
         ),
         migrations.CreateModel(
             name='Comprador',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
+                ('name', models.CharField(max_length=200, verbose_name='Nome')),
             ],
         ),
     ]
