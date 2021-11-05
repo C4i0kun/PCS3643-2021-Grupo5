@@ -16,3 +16,5 @@
  - **[Aula 5 - Modelo de Projeto e Padrões Arquiteturais](Aula5)**
  - **[Aula 6 - Padrões de Projeto e Mapeamento O-R](Aula6)**
  - **[Aula 7 - Prototipação de Interface com o Usuário](Aula7)**
+ - **[Aula 8 - Implementação I: Codificação e Testes de Unidade](Aula8)**
+ - **[Aula 9 - Implementação II: Codificação e Testes de Unidade](Aula9)**
