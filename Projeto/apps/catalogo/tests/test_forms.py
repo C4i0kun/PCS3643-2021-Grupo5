@@ -46,7 +46,7 @@ class LeilaoFormTest(TestCase):
         """Testa se um período de início é válido."""
         form = LeilaoForm(data={
             'name' : 'Teste',
-            'periodoInicio': datetime.now() + timedelta(hours=1),
+            'periodoInicio': datetime.now() + timedelta(hours=10),
             'periodoFinal': datetime.now() + timedelta(days=3)})
         self.assertTrue(form.is_valid())
 
@@ -79,7 +79,7 @@ class LeilaoFormTest(TestCase):
         """Testa se um período final é válido."""
         form = LeilaoForm(data={
             'name' : 'Teste',
-            'periodoInicio': datetime.now() + timedelta(hours=1),
+            'periodoInicio': datetime.now() + timedelta(hours=7),
             'periodoFinal': datetime.now() + timedelta(days=3)})
         self.assertTrue(form.is_valid())
 
