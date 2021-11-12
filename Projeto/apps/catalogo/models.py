@@ -1,18 +1,34 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 from django.conf import settings
 
-class Vendedor(models.Model):
-    name = models.CharField(max_length=200, verbose_name='Nome')
+class CustomUser(User):
+    TIPO_USUARIO_CHOICES = (
+        ("C", "Comprador"),
+        ("L", "Leiloeiro"),
+        ("V", "Vendedor")
+    )
 
-    def __str__(self):
-        return self.name
+    tipo_usuario = models.CharField(max_length=1, choices=TIPO_USUARIO_CHOICES, blank=False, null=False)
 
-class Comprador(models.Model):
-    name = models.CharField(max_length=200, verbose_name='Nome')
+# class Comprador(models.Model):
+#     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.usuario
+
+# class Leiloeiro(models.Model):
+#     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+
+#     def __str__(self):
+#         return self.usuario
+
+# class Vendedor(models.Model):
+#     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+
+#     def __str__(self):
+#         return self.usuario
 
 class Lote(models.Model):
     ESTADO_CHOICES = (
@@ -38,10 +54,17 @@ class Lote(models.Model):
         return reverse('catalogo:detalha_lote', kwargs={'pk': self.pk})
 
 class Leilao(models.Model):
+    STATUS_CHOICES = (
+        ("N", "Não iniciado"),
+        ("A", "Ativo"),
+        ("F", "Finalizado")
+    )
+
     name = models.CharField(max_length=200)
     periodoInicio = models.DateTimeField()
     periodoFinal = models.DateTimeField()
-    
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, blank=False, null=False)
+
     lote = models.OneToOneField(
         Lote,
         on_delete=models.CASCADE,
@@ -60,4 +83,4 @@ class Lance(models.Model):
     leilao = models.ForeignKey(Leilao, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{0}: R${1}'.format(self.comprador.username, self.valor)
+        return '{0} - R${1}'.format(self.comprador.username, self.valor)

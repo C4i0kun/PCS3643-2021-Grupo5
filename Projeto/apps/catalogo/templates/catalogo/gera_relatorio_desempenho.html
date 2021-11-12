@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 id="tcolor"><a href="{% url 'catalogo:gera_relatorio_faturamento' leilao.id %}">Relatório de desempenho</a></h2>
+<h3 id="tcolor">Leilão: {{ leilao.lote.name }}</h2>
+
+
+<div class="detalha-lote">
+    <ul>
+        <li>Valor: R$ {{ leilao.lote.valor_minimo_de_lote }}</li>
+        <li>Valor mínimo de reserva: R$ {{ leilao.lote.valor_minimo_de_reserva }}</li>
+        <li>Lance Vencedor: {{ lance_vencedor }}</li>
+        <li>Taxa de Comissão:{{ leilao.lote.taxa_de_comissao }}</li>
+
+        <br/>
+        
+        <li>Total de Lances: {{ total_de_lances }}</li>
+        <li>Lance Inicial: {{ lance_inicial }}</li>
+        <li>Lance Final: {{ lance_final }}</li>
+    </ul>
+</div>
+
+{% endblock %}

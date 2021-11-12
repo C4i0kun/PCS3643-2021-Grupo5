@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 id="tcolor"><a href="{% url 'catalogo:gera_relatorio' leilao_id %}">Relatório</a>: Escolha o tipo de relatório</h2>
+
+<a href="{% url 'catalogo:gera_relatorio_desempenho' leilao_id %}"><p class="button">Criar relatório de desempenho</p></a>
+
+<a href="{% url 'catalogo:gera_relatorio_faturamento' leilao_id %}"><p class="button">Criar relatório de faturamento</p></a>
+
+{% endblock %}

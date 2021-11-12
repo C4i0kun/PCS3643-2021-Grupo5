@@ -10,7 +10,7 @@
 
 <h3>Alguns Leilões Ativos:</h3>
 <ul class="items">
-    {% for leilao in lista_de_leiloes %}
+    {% for leilao in lista_de_leiloes_ativos %}
     <a href="{% url 'catalogo:detalha_leilao' leilao.id %}">
     <li class="item"><h4>{{ leilao.name }}</h4>
 

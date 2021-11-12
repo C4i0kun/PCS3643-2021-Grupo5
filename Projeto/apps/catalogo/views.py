@@ -8,6 +8,7 @@ from django.forms import ModelForm
 from datetime import datetime, timezone, timedelta
 
 from .models import Lote, Leilao, Lance
+from .permissions import vendedor_required
 
 # Forms
 class LoteForm(ModelForm):
@@ -106,6 +107,10 @@ class LanceForm(ModelForm):
         model = Lance
         fields = ['valor']
 
+    def __init__(self, *args,**kwargs):
+        self.leilao = kwargs.pop('leilao')
+        super(LanceForm, self).__init__(*args, **kwargs)
+
     def clean_valor(self):
         valor = self.cleaned_data['valor']
 
@@ -113,17 +118,36 @@ class LanceForm(ModelForm):
         if float(valor) <= 0:
             raise ValidationError(_('Valor deve ser superior a 0.'))
 
+        v_min_lote = self.leilao.lote.valor_minimo_de_lote
+
+        # Checa se o valor é superior ao valor minimo de lote.
+        if float(valor) < v_min_lote:
+            raise ValidationError(_(f'Valor deve ser igual ou superior ao valor mínimo de lote: \
+                                    R${v_min_lote}.'))
+
+        lances = sorted(list(Lance.objects.filter(leilao__id=self.leilao.id)), key=lambda t: t.valor, reverse=True)
+        if lances:
+            valor_maior_lance = lances[0].valor
+        else:
+            valor_maior_lance = -10000
+
+        v_por_lance = self.leilao.lote.valor_minimo_por_lance
+
+        # Checa se o valor é superior ao valor minimo de lote.
+        if float(valor) < valor_maior_lance + v_por_lance:
+            raise ValidationError(_(f'Valor deve ser superior ao maior lance atual mais o valor mínimo por lance: \
+                                    R${valor_maior_lance + v_por_lance}.'))
+
         return valor
 
 # funções dos lotes
 @login_required
 def principal(request, template_name='catalogo/principal.html'):
     
-    leiloes = Leilao.objects.all()
     lances = Lance.objects.all()
 
     data = {}
-    data['lista_de_leiloes'] = leiloes
+    data['lista_de_leiloes_ativos'] = Leilao.objects.filter(status='A')
 
     # Pegar maior lance depois
 
@@ -137,14 +161,8 @@ def lista_lote(request, template_name='catalogo/lista_lote.html'):
     else:
         lotes = Lote.objects.filter(vendedor=request.user)
 
-    # leiloes = Leilao.objects.all()
-    # lances = Lance.objects.all()
-
     data = {}
     data['lista_de_lotes'] = lotes
-    # data['lista_de_leiloes'] = leiloes
-    # data['lista_de_lances'] = lances
-
     data['lista_de_lotes_disponiveis'] = []
     for lote in lotes:
         if not Leilao.objects.filter(lote = lote):
@@ -165,6 +183,7 @@ def detalha_lote(request, pk, template_name='catalogo/detalha_lote.html'):
     return render(request, template_name, data)
 
 @login_required
+@vendedor_required
 def cria_lote(request, template_name='catalogo/lote_form.html'):
     form = LoteForm(request.POST or None)
     if form.is_valid():
@@ -213,13 +232,19 @@ def deleta_lote(request, pk, template_name='catalogo/lote_confirma_delecao.html'
 @login_required
 def lista_leilao(request, template_name='catalogo/lista_leilao.html'):
     leiloes = Leilao.objects.all()
+    leiloes_nao_iniciados = Leilao.objects.filter(status='N')
+    leiloes_ativos = Leilao.objects.filter(status='A')
+    leiloes_finalizados = Leilao.objects.filter(status='F')
     lances = Lance.objects.all()
 
     data = {}
-    data['lista_de_leiloes'] = leiloes
+    data['lista_de_leiloes_ativos'] = leiloes_ativos
+    data['lista_de_leiloes_nao_iniciados'] = leiloes_nao_iniciados
+    data['lista_de_leiloes_finalizados'] = leiloes_finalizados
     data['lista_de_lances'] = sorted(lances, key=lambda t: t.valor, reverse=True)
 
     return render(request, template_name, data)
+
 
 @login_required
 def cria_leilao(request, id_lote, template_name='catalogo/leilao_form.html'):
@@ -228,6 +253,7 @@ def cria_leilao(request, id_lote, template_name='catalogo/leilao_form.html'):
         leilao = form.save(commit=False)
         lote = get_object_or_404(Lote, pk=id_lote)
         leilao.lote = lote
+        leilao.status = "N"
         leilao.save()
         return redirect('catalogo:detalha_leilao', pk=leilao.id)
     return render(request, template_name, {'form':form})
@@ -252,6 +278,24 @@ def atualiza_leilao(request, pk, template_name='catalogo/leilao_form.html'):
         form.save()
         return redirect('catalogo:detalha_leilao', pk=pk)
     return render(request, template_name, {'form':form})
+    
+@login_required
+def inicia_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
+    leilao= get_object_or_404(Leilao, pk=pk)
+    
+    leilao.status = 'A'
+    leilao.save()
+
+    return redirect('catalogo:detalha_leilao', pk=pk)
+    
+@login_required
+def encerra_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
+    leilao= get_object_or_404(Leilao, pk=pk)
+    
+    leilao.status = 'F'
+    leilao.save()
+
+    return redirect('catalogo:detalha_leilao', pk=pk)
 
 @login_required
 def deleta_leilao(request, pk, template_name='catalogo/leilao_confirma_delecao.html'):
@@ -264,7 +308,7 @@ def deleta_leilao(request, pk, template_name='catalogo/leilao_confirma_delecao.h
 
 @login_required
 def faz_lance(request, id_leilao, template_name='catalogo/lance_form.html'):
-    form = LanceForm(request.POST or None)
+    form = LanceForm(request.POST or None, leilao=get_object_or_404(Leilao, pk=id_leilao))
     if form.is_valid():
         lance = form.save(commit=False)
         leilao = get_object_or_404(Leilao, pk=id_leilao)
@@ -273,3 +317,39 @@ def faz_lance(request, id_leilao, template_name='catalogo/lance_form.html'):
         lance.save()
         return redirect('catalogo:detalha_leilao', pk=id_leilao)
     return render(request, template_name, {'form':form})
+
+@login_required
+def gera_relatorio(request, id_leilao, template_name='catalogo/gera_relatorio.html'):
+
+    data = {}
+    data['leilao_id'] = id_leilao
+
+    return render(request, template_name, data)
+
+@login_required
+def gera_relatorio_desempenho(request, id_leilao, template_name='catalogo/gera_relatorio_desempenho.html'):
+    leilao= get_object_or_404(Leilao, pk=id_leilao)
+
+    lista_de_lances = list(Lance.objects.filter(leilao__id=id_leilao))
+
+    data = {}
+    data['leilao'] = leilao
+    data['lance_vencedor'] = sorted(lista_de_lances, key=lambda t: t.valor, reverse=True)[0]
+    data['total_de_lances'] = len(lista_de_lances)
+    data['lance_inicial'] = lista_de_lances[0]
+    data['lance_final'] = lista_de_lances[-1]
+
+    return render(request, template_name, data)
+
+
+@login_required
+def gera_relatorio_faturamento(request, id_leilao, template_name='catalogo/gera_relatorio_faturamento.html'):
+    leilao= get_object_or_404(Leilao, pk=id_leilao)
+
+    data = {}
+    data['leilao'] = leilao
+    data['lance_vencedor'] = sorted(list(Lance.objects.filter(leilao__id=id_leilao)), key=lambda t: t.valor, reverse=True)[0]
+    data['comissao_comprador'] = data['lance_vencedor'].valor * leilao.lote.taxa_de_comissao
+    data['comissao_vendedor'] = leilao.lote.valor_minimo_de_reserva * leilao.lote.taxa_de_comissao
+
+    return render(request, template_name, data)

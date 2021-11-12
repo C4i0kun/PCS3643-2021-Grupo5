@@ -1,19 +1,29 @@
 {% extends "base.html" %}
 
+{% load filter %}
+
 {% block content %}
 
 <h2><a href="{% url 'catalogo:lista_leilao' %}">Leilões Ativos</a></h2> 
 
 <ul>
-    {% for leilao in lista_de_leiloes %}
+    {% for leilao in lista_de_leiloes_ativos %}
     <li>{{ leilao.name }}
     <a href="{% url 'catalogo:detalha_leilao' leilao.id %}">Ver Detalhes</a>
     <ul>
         <li>Lote: {{leilao.lote.name}}</li>
         <li>Descrição: {{leilao.lote.descricao}}</li>
-    </ul>
-    <ul>
-        <li>Lance Vencedor:</li>
+        <li>Lance Vencedor:
+        {% if lista_de_lances|pega_lances_de_leilao:leilao.id|first %}
+        <ul>
+            <li>{{ lista_de_lances|pega_lances_de_leilao:leilao.id|first }}</li> 
+        </ul>
+        {% else %}
+        <ul>
+            <li>Não há lances.</li>
+        </ul>
+        {% endif %}
+        </li>
         <ul>
             {% for lance in lista_de_lances %}
             {% if lance.leilao.id == leilao.id %}
@@ -25,6 +35,48 @@
         </ul>
     </ul>
     </li>
+    {% empty %}
+    <li>Não há leilões ativos.</li>
+    {% endfor %}
+</ul>
+
+<h2><a href="{% url 'catalogo:lista_leilao' %}">Leilões Não Iniciados</a></h2> 
+
+<ul>
+    {% for leilao in lista_de_leiloes_nao_iniciados %}
+    <li>{{ leilao.name }}
+    <a href="{% url 'catalogo:detalha_leilao' leilao.id %}">Ver Detalhes</a>
+    <ul>
+        <li>Lote: {{leilao.lote.name}}</li>
+        <li>Descrição: {{leilao.lote.descricao}}</li>
+    </ul>
+    </li>{% empty %}
+    <li>Não há leilões não iniciados.</li>
+    {% endfor %}
+</ul>
+
+<h2><a href="{% url 'catalogo:lista_leilao' %}">Leilões Finalizados</a></h2> 
+
+<ul>
+    {% for leilao in lista_de_leiloes_finalizados %}
+    <li>{{ leilao.name }}
+    <a href="{% url 'catalogo:detalha_leilao' leilao.id %}">Ver Detalhes</a>
+    <ul>
+        <li>Lote: {{leilao.lote.name}}</li>
+        <li>Descrição: {{leilao.lote.descricao}}</li>
+        <li>Lance Vencedor:
+        {% if lista_de_lances|pega_lances_de_leilao:leilao.id|first %}
+        <ul>
+            <li>{{ lista_de_lances|pega_lances_de_leilao:leilao.id|first }}</li> 
+        </ul>
+        {% else %}
+        <ul>
+            <li>Não há lances.</li>
+        </ul>
+        {% endif %}
+    </ul>
+    {% empty %}
+    <li>Não há leilões finalizados.</li>
     {% endfor %}
 </ul>
 
