@@ -7,22 +7,44 @@
 <div class="detalha-lote">
     <ul>
         <li>Nome: {{ lote.name }}</li>
-        <li>Valor: R$ {{ lote.valor_minimo_de_lote }}</li>
-        <li>Valor mínimo de reserva: R$ {{ lote.valor_minimo_de_reserva }}</li>
-        <li>Valor mínimo por lance: R$ {{ lote.valor_minimo_por_lance }}</li>
         <li>Descrição:{{ lote.descricao }}</li>
-        <li>Estado:{{ lote.estado }}</li>
+        <li>Estado:{{ estado }}</li>
+        <li>Vendedor: {{ lote.vendedor.username }}</li>
+
+        <br/>
+        
+        <li>Valor mínimo de reserva: R$ {{ lote.valor_minimo_de_reserva }}</li>
         <li>Taxa de Comissão:{{ lote.taxa_de_comissao }}</li>
+
+        <br/>
+
+        {% if lote.valor_minimo_de_lote != 0 %}
+        <li>Valor mínimo de lote: R$ {{ lote.valor_minimo_de_lote }}</li>
+        <li>Valor mínimo por lance: R$ {{ lote.valor_minimo_por_lance }}</li>
+        {% else %}
+        <p>É necessário que o leiloeiro preencha os valores de lote e por lance do lote.</p>
+        {% endif %}
     
     </ul>
 
     <div class="detalha-lote-botoes">
+        {% if tipo_usuario == 'L' or tipo_usuario == 'A' %}
+        {% if lote.valor_minimo_de_lote != 0 %}
         <div class="detalha-lote-botao-lateral">
             <a href="{% url 'catalogo:cria_leilao' lote.id %}"><p class="small-button">Cria Leilão</p></a>
         </div>
+        {% endif %}
+        {% endif %}
+        {% if tipo_usuario == 'V' or tipo_usuario == 'A' %}
         <div class="detalha-lote-botao-central">
-            <a href="{% url 'catalogo:atualiza_lote' lote.id %}"><p class="small-button">Editar</p></a>
+            <a href="{% url 'catalogo:atualiza_lote' lote.id %}"><p class="small-button">Editar Detalhes</p></a>
         </div>
+        {% endif %}
+        {% if tipo_usuario == 'L' or tipo_usuario == 'A' %}
+        <div class="detalha-lote-botao-central">
+            <a href="{% url 'catalogo:insere_valores' lote.id %}"><p class="small-button">Inserir Valores</p></a>
+        </div>
+        {% endif %}
         <div class="detalha-lote-botao-lateral">
             <a href="{% url 'catalogo:deleta_lote' lote.id %}"><p class="small-button">Deletar</p></a>
         </div>

@@ -6,12 +6,16 @@
 
 <ul>
     {% for lote in lista_de_lotes_disponiveis %}
-    <li>{{ lote.name }}  ({{ lote.valor_minimo_de_lote }} Valor)
-    <a href="{% url 'catalogo:detalha_lote' lote.id %}">Ver Detalhes</a>
-    </li>
+    <li>{{ lote.name }}</li>
+    <ul>
+        <li>Vendedor:  {{ lote.vendedor.username }}</li>
+        <li><a href="{% url 'catalogo:detalha_lote' lote.id %}">Ver Detalhes</a></li>
+    </ul>
     {% endfor %}
 </ul>
 
+{% if tipo_usuario == 'V' or tipo_usuario == 'A' %}
 <a href="{% url 'catalogo:cria_lote' %}">Novo lote</a>
+{% endif %}
 
 {% endblock %}

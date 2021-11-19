@@ -7,47 +7,46 @@ from django.forms import ModelForm
 
 from datetime import datetime, timezone, timedelta
 
-from .models import Lote, Leilao, Lance
-from .permissions import vendedor_required
+from .models import CustomUser, Lote, Leilao, Lance
+from .permissions import comprador_required, vendedor_required, leiloeiro_required, vendedor_or_leiloeiro_required, get_tipo_usuario
 
 # Forms
 class LoteForm(ModelForm):
     class Meta:
         model = Lote
-        fields = ['name', 'descricao', 'estado', 
-                  'valor_minimo_de_lote', 'valor_minimo_de_reserva', 'valor_minimo_por_lance']
+        fields = ['name', 'descricao', 'estado', 'valor_minimo_de_reserva']
 
-    def clean_valor_minimo_de_lote(self):
-        valor_minimo_de_lote = self.cleaned_data['valor_minimo_de_lote']
+    # def clean_valor_minimo_de_lote(self):
+    #     valor_minimo_de_lote = self.cleaned_data['valor_minimo_de_lote']
 
-        # Checa se o valor mínimo do lote é superior a zero.
-        if float(valor_minimo_de_lote) <= 0:
-            raise ValidationError(_('Valor mínimo do lote deve ser superior a 0.'))
+    #     # Checa se o valor mínimo do lote é superior a zero.
+    #     if float(valor_minimo_de_lote) <= 0:
+    #         raise ValidationError(_('Valor mínimo do lote deve ser superior a 0.'))
 
-        return valor_minimo_de_lote
+    #     return valor_minimo_de_lote
      
     def clean_valor_minimo_de_reserva(self):
-        valor_minimo_de_lote = self.data['valor_minimo_de_lote']
+        # valor_minimo_de_lote = self.data['valor_minimo_de_lote']
         valor_minimo_de_reserva = self.cleaned_data['valor_minimo_de_reserva']
 
         # Checa se o valor mínimo de reserva é superior a zero.
         if float(valor_minimo_de_reserva) <= 0:
             raise ValidationError(_('Valor mínimo de reserva deve ser superior a 0.'))
 
-        # Checa se o valor mínimo de reserva é superior ao valor mínimo de lote.
-        if float(valor_minimo_de_reserva) <= float(valor_minimo_de_lote):
-            raise ValidationError(_('Valor mínimo de reserva deve ser superior ao valor mínimo do lote.'))
+        # # Checa se o valor mínimo de reserva é superior ao valor mínimo de lote.
+        # if float(valor_minimo_de_reserva) <= float(valor_minimo_de_lote):
+        #     raise ValidationError(_('Valor mínimo de reserva deve ser superior ao valor mínimo do lote.'))
 
         return valor_minimo_de_reserva
     
-    def clean_valor_minimo_por_lance(self):
-        valor_minimo_por_lance = self.cleaned_data['valor_minimo_por_lance']
+    # def clean_valor_minimo_por_lance(self):
+    #     valor_minimo_por_lance = self.cleaned_data['valor_minimo_por_lance']
 
-        # Checa se o valor mínimo por lance é superior a zero.
-        if float(valor_minimo_por_lance) <= 0:
-            raise ValidationError(_('Valor mínimo por lance deve ser superior a 0.'))
+    #     # Checa se o valor mínimo por lance é superior a zero.
+    #     if float(valor_minimo_por_lance) <= 0:
+    #         raise ValidationError(_('Valor mínimo por lance deve ser superior a 0.'))
 
-        return valor_minimo_por_lance
+    #     return valor_minimo_por_lance
 
 class LeilaoForm(ModelForm):
     class Meta:
@@ -148,6 +147,7 @@ def principal(request, template_name='catalogo/principal.html'):
 
     data = {}
     data['lista_de_leiloes_ativos'] = Leilao.objects.filter(status='A')
+    data['tipo_usuario'] = get_tipo_usuario(request.user)
 
     # Pegar maior lance depois
 
@@ -156,7 +156,7 @@ def principal(request, template_name='catalogo/principal.html'):
 # funções dos lotes
 @login_required
 def lista_lote(request, template_name='catalogo/lista_lote.html'):
-    if request.user.is_superuser:
+    if request.user.is_superuser or get_tipo_usuario(request.user) == 'L':
         lotes = Lote.objects.all()
     else:
         lotes = Lote.objects.filter(vendedor=request.user)
@@ -165,20 +165,24 @@ def lista_lote(request, template_name='catalogo/lista_lote.html'):
     data['lista_de_lotes'] = lotes
     data['lista_de_lotes_disponiveis'] = []
     for lote in lotes:
-        if not Leilao.objects.filter(lote = lote):
+        if not Leilao.objects.filter(lote = lote).exclude(status='C'):
             data['lista_de_lotes_disponiveis'].append(lote)
+            
+    data['tipo_usuario'] = get_tipo_usuario(request.user)
 
     return render(request, template_name, data)
 
 @login_required
 def detalha_lote(request, pk, template_name='catalogo/detalha_lote.html'):
-    if request.user.is_superuser:
+    if request.user.is_superuser or get_tipo_usuario(request.user) == 'L':
         lote= get_object_or_404(Lote, pk=pk)
     else:
         lote= get_object_or_404(Lote, pk=pk, vendedor=request.user)
 
     data = {}
     data['lote'] = lote
+    data['tipo_usuario'] = get_tipo_usuario(request.user)
+    data['estado'] = lote.ESTADO_DICT[lote.estado]
 
     return render(request, template_name, data)
 
@@ -190,13 +194,16 @@ def cria_lote(request, template_name='catalogo/lote_form.html'):
         lote = form.save(commit=False)
         lote.vendedor = request.user
 
-        if lote.valor_minimo_de_lote <= 1000:
+        lote.valor_minimo_de_lote = 0
+        lote.valor_minimo_por_lance = 0
+
+        if lote.valor_minimo_de_reserva <= 1000:
             lote.taxa_de_comissao = 1/100
-        elif lote.valor_minimo_de_lote <= 10000:
+        elif lote.valor_minimo_de_reserva <= 10000:
             lote.taxa_de_comissao = 2/100
-        elif lote.valor_minimo_de_lote <= 50000:
+        elif lote.valor_minimo_de_reserva <= 50000:
             lote.taxa_de_comissao = 3/100
-        elif lote.valor_minimo_de_lote <= 100000:
+        elif lote.valor_minimo_de_reserva <= 100000:
             lote.taxa_de_comissao = 4/100
         else:
             lote.taxa_de_comissao = 5/100
@@ -206,20 +213,43 @@ def cria_lote(request, template_name='catalogo/lote_form.html'):
     return render(request, template_name, {'form':form})
 
 @login_required
+@vendedor_required
 def atualiza_lote(request, pk, template_name='catalogo/lote_form.html'):
-    if request.user.is_superuser:
+    if request.user.is_superuser or get_tipo_usuario(request.user) == 'L':
         lote= get_object_or_404(Lote, pk=pk)
     else:
         lote= get_object_or_404(Lote, pk=pk, vendedor=request.user)
+    
     form = LoteForm(request.POST or None, instance=lote)
+    
     if form.is_valid():
         form.save()
         return redirect('catalogo:detalha_lote', pk=pk)
+        
     return render(request, template_name, {'form':form})
 
+
 @login_required
+@leiloeiro_required
+def insere_valores(request, pk, template_name='catalogo/insere_valores.html'):
+    if request.user.is_superuser or get_tipo_usuario(request.user) == 'L':
+        lote= get_object_or_404(Lote, pk=pk)
+    else:
+        lote= get_object_or_404(Lote, pk=pk, vendedor=request.user)
+        
+    if request.method == "POST":
+        lote.valor_minimo_de_lote = request.POST.get("valor_minimo_de_lote", None)
+        lote.valor_minimo_por_lance = request.POST.get("valor_minimo_por_lance", None)
+
+        lote.save()
+        return redirect('catalogo:detalha_lote', pk=pk)
+
+    return render(request, template_name)
+
+@login_required
+@vendedor_or_leiloeiro_required
 def deleta_lote(request, pk, template_name='catalogo/lote_confirma_delecao.html'):
-    if request.user.is_superuser:
+    if request.user.is_superuser or get_tipo_usuario(request.user) == 'L':
         lote= get_object_or_404(Lote, pk=pk)
     else:
         lote= get_object_or_404(Lote, pk=pk, vendedor=request.user)
@@ -235,18 +265,21 @@ def lista_leilao(request, template_name='catalogo/lista_leilao.html'):
     leiloes_nao_iniciados = Leilao.objects.filter(status='N')
     leiloes_ativos = Leilao.objects.filter(status='A')
     leiloes_finalizados = Leilao.objects.filter(status='F')
+    leiloes_cancelados = Leilao.objects.filter(status='C')
     lances = Lance.objects.all()
 
     data = {}
     data['lista_de_leiloes_ativos'] = leiloes_ativos
     data['lista_de_leiloes_nao_iniciados'] = leiloes_nao_iniciados
     data['lista_de_leiloes_finalizados'] = leiloes_finalizados
+    data['lista_de_leiloes_cancelados'] = leiloes_cancelados
     data['lista_de_lances'] = sorted(lances, key=lambda t: t.valor, reverse=True)
 
     return render(request, template_name, data)
 
 
 @login_required
+@leiloeiro_required
 def cria_leilao(request, id_lote, template_name='catalogo/leilao_form.html'):
     form = LeilaoForm(request.POST or None)
     if form.is_valid():
@@ -266,10 +299,14 @@ def detalha_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
     data = {}
     data['leilao'] = leilao
     data['lista_de_lances'] = sorted(lances, key=lambda t: t.valor, reverse=True)
+    data['tipo_usuario'] = get_tipo_usuario(request.user) 
+    data['status'] = leilao.STATUS_DICT[leilao.status]
+    data['estado'] = leilao.lote.ESTADO_DICT[leilao.lote.estado]
 
     return render(request, template_name, data)
 
 @login_required
+@leiloeiro_required
 def atualiza_leilao(request, pk, template_name='catalogo/leilao_form.html'):
     leilao= get_object_or_404(Leilao, pk=pk)
     
@@ -280,6 +317,7 @@ def atualiza_leilao(request, pk, template_name='catalogo/leilao_form.html'):
     return render(request, template_name, {'form':form})
     
 @login_required
+@leiloeiro_required
 def inicia_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
     leilao= get_object_or_404(Leilao, pk=pk)
     
@@ -289,6 +327,7 @@ def inicia_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
     return redirect('catalogo:detalha_leilao', pk=pk)
     
 @login_required
+@leiloeiro_required
 def encerra_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
     leilao= get_object_or_404(Leilao, pk=pk)
     
@@ -298,6 +337,17 @@ def encerra_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
     return redirect('catalogo:detalha_leilao', pk=pk)
 
 @login_required
+@leiloeiro_required
+def cancela_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
+    leilao= get_object_or_404(Leilao, pk=pk)
+    
+    leilao.status = 'C'
+    leilao.save()
+
+    return redirect('catalogo:detalha_leilao', pk=pk)
+
+@login_required
+@leiloeiro_required
 def deleta_leilao(request, pk, template_name='catalogo/leilao_confirma_delecao.html'):
     leilao= get_object_or_404(Leilao, pk=pk)
     
@@ -307,6 +357,7 @@ def deleta_leilao(request, pk, template_name='catalogo/leilao_confirma_delecao.h
     return render(request, template_name, {'object':leilao})
 
 @login_required
+@comprador_required
 def faz_lance(request, id_leilao, template_name='catalogo/lance_form.html'):
     form = LanceForm(request.POST or None, leilao=get_object_or_404(Leilao, pk=id_leilao))
     if form.is_valid():
@@ -319,6 +370,7 @@ def faz_lance(request, id_leilao, template_name='catalogo/lance_form.html'):
     return render(request, template_name, {'form':form})
 
 @login_required
+@leiloeiro_required
 def gera_relatorio(request, id_leilao, template_name='catalogo/gera_relatorio.html'):
 
     data = {}
@@ -327,6 +379,7 @@ def gera_relatorio(request, id_leilao, template_name='catalogo/gera_relatorio.ht
     return render(request, template_name, data)
 
 @login_required
+@leiloeiro_required
 def gera_relatorio_desempenho(request, id_leilao, template_name='catalogo/gera_relatorio_desempenho.html'):
     leilao= get_object_or_404(Leilao, pk=id_leilao)
 
@@ -334,22 +387,79 @@ def gera_relatorio_desempenho(request, id_leilao, template_name='catalogo/gera_r
 
     data = {}
     data['leilao'] = leilao
-    data['lance_vencedor'] = sorted(lista_de_lances, key=lambda t: t.valor, reverse=True)[0]
+    data['lance_vencedor'] = sorted(lista_de_lances, key=lambda t: t.valor, reverse=True)[0] if lista_de_lances else None
     data['total_de_lances'] = len(lista_de_lances)
-    data['lance_inicial'] = lista_de_lances[0]
-    data['lance_final'] = lista_de_lances[-1]
+    data['lance_inicial'] = lista_de_lances[0] if lista_de_lances else 'Não houve lances.'
+    data['lance_final'] = lista_de_lances[-1] if lista_de_lances else 'Não houve lances.'
+    data['status'] = 'Finalizado com sucesso.' if leilao.status == 'F' else 'Cancelado.'
 
     return render(request, template_name, data)
 
 
 @login_required
+@leiloeiro_required
 def gera_relatorio_faturamento(request, id_leilao, template_name='catalogo/gera_relatorio_faturamento.html'):
     leilao= get_object_or_404(Leilao, pk=id_leilao)
 
+    lista_de_lances = list(Lance.objects.filter(leilao__id=id_leilao))
+
     data = {}
     data['leilao'] = leilao
-    data['lance_vencedor'] = sorted(list(Lance.objects.filter(leilao__id=id_leilao)), key=lambda t: t.valor, reverse=True)[0]
-    data['comissao_comprador'] = data['lance_vencedor'].valor * leilao.lote.taxa_de_comissao
+    data['lance_vencedor'] = sorted(lista_de_lances, key=lambda t: t.valor, reverse=True)[0] if lista_de_lances else None
+    data['comissao_comprador'] = data['lance_vencedor'].valor * leilao.lote.taxa_de_comissao if leilao.status == 'F' else None
     data['comissao_vendedor'] = leilao.lote.valor_minimo_de_reserva * leilao.lote.taxa_de_comissao
+
+    data['status'] = 'Finalizado com sucesso.' if leilao.status == 'F' else 'Cancelado.'
+
+    return render(request, template_name, data)
+
+@login_required
+@leiloeiro_required
+def gera_relatorio_desempenho_geral(request, template_name='catalogo/gera_relatorio_desempenho_geral.html'):
+
+    data = {}
+    data['leiloes_totais'] = len(list(Leilao.objects.all()))
+    data['lotes_totais'] = len(list(Lance.objects.all()))
+    data['lances_totais'] = len(list(Lote.objects.all()))
+    data['usuarios_cadastrados'] = len(list(CustomUser.objects.all()))
+
+    data['leiloes_ativos'] = len(list(Leilao.objects.filter(status='A')))
+    data['leiloas_cancelados'] = len(list(Leilao.objects.filter(status='C')))
+    data['leiloes_finalizados'] = len(list(Leilao.objects.filter(status='F')))
+    data['leiloes_nao_iniciados'] = len(list(Leilao.objects.filter(status='N')))
+
+    return render(request, template_name, data)
+
+@login_required
+@leiloeiro_required
+def gera_relatorio_faturamento_geral(request, template_name='catalogo/gera_relatorio_faturamento_geral.html'):
+    leiloes_finalizados = list(Leilao.objects.filter(status='F'))
+
+    data = {}
+    data['faturamento_total'] = 0
+    data['comissoes_pagas_por_compradores'] = 0
+    data['comissoes_pagas_por_vendedores'] = 0
+    data['valor_total_de_lances'] = 0
+
+    for leilao in leiloes_finalizados:
+        lista_de_lances = sorted(Lance.objects.filter(leilao_id = leilao.id), key=lambda t: t.valor, reverse=True)
+        maior_lance = lista_de_lances[0] if lista_de_lances else None
+
+        if maior_lance.valor <= 1000:
+            taxa_de_comissao = 1/100
+        elif maior_lance.valor <= 10000:
+            taxa_de_comissao = 2/100
+        elif maior_lance.valor <= 50000:
+            taxa_de_comissao = 3/100
+        elif maior_lance.valor <= 100000:
+            taxa_de_comissao = 4/100
+        else:
+            taxa_de_comissao = 5/100
+
+        data['comissoes_pagas_por_compradores'] += maior_lance.valor * taxa_de_comissao
+        data['comissoes_pagas_por_vendedores'] += leilao.lote.valor_minimo_de_reserva * leilao.lote.taxa_de_comissao
+
+    data['faturamento_total'] = data['comissoes_pagas_por_compradores'] + data['comissoes_pagas_por_vendedores']
+        
 
     return render(request, template_name, data)

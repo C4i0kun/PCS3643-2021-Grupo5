@@ -80,4 +80,29 @@
     {% endfor %}
 </ul>
 
+<h2><a href="{% url 'catalogo:lista_leilao' %}">Leilões Cancelados</a></h2> 
+
+<ul>
+    {% for leilao in lista_de_leiloes_cancelados %}
+    <li>{{ leilao.name }}
+    <a href="{% url 'catalogo:detalha_leilao' leilao.id %}">Ver Detalhes</a>
+    <ul>
+        <li>Lote: {{leilao.lote.name}}</li>
+        <li>Descrição: {{leilao.lote.descricao}}</li>
+        <li>Lance Vencedor:
+        {% if lista_de_lances|pega_lances_de_leilao:leilao.id|first %}
+        <ul>
+            <li>{{ lista_de_lances|pega_lances_de_leilao:leilao.id|first }}</li> 
+        </ul>
+        {% else %}
+        <ul>
+            <li>Não há lances.</li>
+        </ul>
+        {% endif %}
+    </ul>
+    {% empty %}
+    <li>Não há leilões cancelados.</li>
+    {% endfor %}
+</ul>
+
 {% endblock %}

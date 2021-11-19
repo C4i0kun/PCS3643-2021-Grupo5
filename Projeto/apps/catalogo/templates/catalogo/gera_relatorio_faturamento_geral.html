@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 id="tcolor"><a href="{% url 'catalogo:gera_relatorio_faturamento_geral' %}">Relatório de faturamento geral</a></h2>
+
+
+<div class="detalha-lote">
+    <ul>
+        <li>Valor total das comissões pagas por vendedores: R$ {{ comissoes_pagas_por_vendedores }}</li>
+        <br/>
+        <li>Valor total das comissões pagas por compradores: R$ {{ comissoes_pagas_por_compradores }}</li>
+        <br/>
+        <!-- <li>Valor total de todos os lances: R$ {{ valor_total_de_lances }}</li> -->
+        <!-- <br/> -->
+        <li>Faturamento Total: R$ {{ faturamento_total }}</li>
+    </ul>
+</div>
+
+{% endblock %}

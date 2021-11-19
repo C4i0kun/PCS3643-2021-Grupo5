@@ -2,11 +2,17 @@
 
 {% block content %}
 
+
+{% if tipo_usuario != 'C' %}
 <a href="{% url 'catalogo:lista_lote' %}"><p class="button">Ver seus Lotes</p></a>
-
-
+{% endif %}
 
 <p class="button"><a href="{% url 'catalogo:lista_leilao' %}">Ver Leilões Ativos</a></p>
+
+{% if tipo_usuario == 'L' %}
+<a href="{% url 'catalogo:gera_relatorio_desempenho_geral' %}"><p class="button">Ver Relatório Geral de Desempenho</p></a>
+<a href="{% url 'catalogo:gera_relatorio_faturamento_geral' %}"><p class="button">Ver Relatório Geral de Faturamento</p></a>
+{% endif %}
 
 <h3>Alguns Leilões Ativos:</h3>
 <ul class="items">

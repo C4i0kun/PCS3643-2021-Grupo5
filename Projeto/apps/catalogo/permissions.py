@@ -47,3 +47,14 @@ def vendedor_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, lo
     if function:
         return decorator(function)
     return decorator
+
+def vendedor_or_leiloeiro_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url='login'):
+    decorator = user_passes_test(
+        lambda u: get_tipo_usuario(u) == 'V' or get_tipo_usuario(u) == 'L' or get_tipo_usuario(u) == 'A',
+        login_url=login_url,
+        redirect_field_name=redirect_field_name
+    )
+
+    if function:
+        return decorator(function)
+    return decorator

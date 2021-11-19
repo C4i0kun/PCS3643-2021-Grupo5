@@ -8,10 +8,18 @@
 
 <div class="detalha-lote">
     <ul>
-        <li>Valor: R$ {{ leilao.lote.valor_minimo_de_lote }}</li>
+        <li>Valor mínimo de lote: R$ {{ leilao.lote.valor_minimo_de_lote }}</li>
         <li>Valor mínimo de reserva: R$ {{ leilao.lote.valor_minimo_de_reserva }}</li>
+        <li>Taxa de Comissão: {{ leilao.lote.taxa_de_comissao }}</li>
+        {% if lance_vencedor %}
         <li>Lance Vencedor: {{ lance_vencedor }}</li>
-        <li>Taxa de Comissão:{{ leilao.lote.taxa_de_comissao }}</li>
+        {% else %}
+        <li>Lance Vencedor: Não houve lance vencedor.</li>
+        {% endif %}
+        
+        <br/>
+        
+        <li>Resultado: {{ status }}</li>
 
         <br/>
         

@@ -9,12 +9,21 @@
 <div class="detalha-lote">
     <ul>
         <li>Nome: {{ leilao.lote.name }}</li>
-        <li>Valor: R$ {{ leilao.lote.valor_minimo_de_lote }}</li>
-        <li>Valor mínimo de reserva: R$ {{ leilao.lote.valor_minimo_de_reserva }}</li>
-        <li>Valor mínimo por lance: R$ {{ leilao.lote.valor_minimo_por_lance }}</li>
         <li>Descrição:{{ leilao.lote.descricao }}</li>
-        <li>Estado:{{ leilao.lote.estado }}</li>
-        <li>Taxa de Comissão:{{ leilao.lote.taxa_de_comissao }}</li>
+        <li>Estado:{{ estado }}</li>
+        <li>Vendedor: {{ leilao.lote.vendedor.username }}</li>
+        
+        <br/>
+
+        <li>Valor mínimo de lote: R$ {{ leilao.lote.valor_minimo_de_lote }}</li>
+        <li>Valor mínimo por lance: R$ {{ leilao.lote.valor_minimo_por_lance }}</li>
+        
+        <br/>
+        
+        {% if tipo_usuario == 'V' or tipo_usuario == 'L' or tipo_usuario == 'A' %}
+        <li>Valor mínimo de reserva: R$ {{ leilao.lote.valor_minimo_de_reserva }}</li>
+        <li>Taxa de comissão do vendedor:{{ leilao.lote.taxa_de_comissao }}</li>
+        {% endif %}
 
         <br/>
         
@@ -33,29 +42,47 @@
     
     <div class="detalha-lote-botoes">
         {% if leilao.status == 'N' %}
+        {% if tipo_usuario == 'L' or tipo_usuario == 'A' %}
         <div class="detalha-lote-botao-lateral">
             <a href="{% url 'catalogo:inicia_leilao' leilao.id %}"><p class="small-button">Iniciar Leilão</p></a>
         </div>
         {% endif %}
+        {% endif %}
         {% if leilao.status == 'A' %}
+        {% if tipo_usuario == 'C' or tipo_usuario == 'A' %}
         <div class="detalha-lote-botao-lateral">
             <a href="{% url 'catalogo:faz_lance' leilao.id %}"><p class="small-button">Fazer Lance</p></a>
         </div>
+        {% endif %}
+        {% if tipo_usuario == 'L' or tipo_usuario == 'A' %}
         <div class="detalha-lote-botao-lateral">
-            <a href="{% url 'catalogo:encerra_leilao' leilao.id %}"><p class="small-button">Encerrar Leilão</p></a>
+            <a href="{% url 'catalogo:cancela_leilao' leilao.id %}"><p class="small-button">Cancelar Leilão</p></a>
         </div>
         {% endif %}
-        {% if leilao.status == 'F' %}
+        {% if tipo_usuario == 'L' or tipo_usuario == 'A' %}
+        <div class="detalha-lote-botao-central">
+            <a href="{% url 'catalogo:encerra_leilao' leilao.id %}"><p class="small-button">Finalizar Leilão</p></a>
+        </div>
+        {% endif %}
+        {% endif %}
+        {% if leilao.status == 'F' or leilao.status == 'C' %}
+        {% if tipo_usuario == 'L' or tipo_usuario == 'A' %}
         <div class="detalha-lote-botao-lateral">
             <a href="{% url 'catalogo:gera_relatorio' leilao.id %}"><p class="small-button">Gerar Relatório</p></a>
         </div>
         {% endif %}
+        {% endif %}
+        {% if tipo_usuario == 'L' or tipo_usuario == 'A' %}
         <div class="detalha-lote-botao-central">
             <a href="{% url 'catalogo:atualiza_leilao' leilao.id %}"><p class="small-button">Editar</p></a>
         </div>
+        {% endif %}
+        
+        {% if tipo_usuario == 'A' %}
         <div class="detalha-lote-botao-lateral">
             <a href="{% url 'catalogo:deleta_leilao' leilao.id %}"><p class="small-button">Deletar</p></a>
         </div>
+        {% endif %}
     </div>
 </div>
 

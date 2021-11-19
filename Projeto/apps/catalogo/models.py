@@ -37,6 +37,8 @@ class Lote(models.Model):
         ("U", "Usado")
     )
 
+    ESTADO_DICT = {"N": "Novo", "S": "Seminovo", "U": "Usado"}
+
     name = models.CharField(max_length=200)
     descricao = models.CharField(max_length=1000)
     estado = models.CharField(max_length=1, choices=ESTADO_CHOICES, blank=False, null=False)
@@ -57,18 +59,18 @@ class Leilao(models.Model):
     STATUS_CHOICES = (
         ("N", "Não iniciado"),
         ("A", "Ativo"),
+        ("C", "Cancelado"),
         ("F", "Finalizado")
     )
+
+    STATUS_DICT = {"N": "Não iniciado", "A": "Ativo", "C": "Cancelado", "F": "Finalizado"}
 
     name = models.CharField(max_length=200)
     periodoInicio = models.DateTimeField()
     periodoFinal = models.DateTimeField()
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, blank=False, null=False)
 
-    lote = models.OneToOneField(
-        Lote,
-        on_delete=models.CASCADE,
-    )
+    lote = models.ForeignKey(Lote, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

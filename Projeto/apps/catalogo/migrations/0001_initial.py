@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
                 ('periodoInicio', models.DateTimeField()),
                 ('periodoFinal', models.DateTimeField()),
                 ('status',  models.CharField(max_length=1, choices=STATUS_LEILAO_CHOICES, blank=False, null=False)),
-                ('lote', models.OneToOneField(to='Lote', on_delete=models.CASCADE))
+                ('lote', models.ForeignKey(to='Lote', on_delete=models.CASCADE))
             ],
         ),
         migrations.CreateModel(

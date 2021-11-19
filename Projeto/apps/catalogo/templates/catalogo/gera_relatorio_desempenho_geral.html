@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 id="tcolor"><a href="{% url 'catalogo:gera_relatorio_desempenho_geral' %}">Relatório de desempenho geral</a></h2>
+
+
+<div class="detalha-lote">
+    <ul>
+        <li>Número total de leilões: {{ leiloes_totais }}</li>
+        <ul>
+            <li>Leilões ativos: {{ leiloes_ativos }}</li>
+            <li>Leilões cancelados: {{ leiloas_cancelados }}</li>
+            <li>Leilões finalizados: {{ leiloes_finalizados }}</li>
+            <li>Leilões não iniciados: {{ leiloes_nao_iniciados }}</li>
+        </ul>
+        <li>Número total de lotes: {{ lotes_totais }}</li>
+        <li>Número total de lances: {{ lances_totais }}</li>
+        <li>Número total de usuários cadastrados: {{ usuarios_cadastrados }}</li>
+    </ul>
+</div>
+
+{% endblock %}
