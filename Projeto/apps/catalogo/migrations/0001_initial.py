@@ -55,6 +55,7 @@ class Migration(migrations.Migration):
                 ('valor_minimo_de_lote', models.FloatField()),
                 ('valor_minimo_de_reserva', models.FloatField()),
                 ('valor_minimo_por_lance', models.FloatField()),
+                ('pago', models.BooleanField()),
                 ('vendedor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),

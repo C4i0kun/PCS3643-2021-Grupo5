@@ -4,11 +4,13 @@ from django.core.exceptions import ValidationError
 from django.utils.timezone import utc
 from django.utils.translation import ugettext_lazy as _
 from django.forms import ModelForm
+from django.http import HttpResponse
 
 from datetime import datetime, timezone, timedelta
 
 from .models import CustomUser, Lote, Leilao, Lance
 from .permissions import comprador_required, vendedor_required, leiloeiro_required, vendedor_or_leiloeiro_required, get_tipo_usuario
+from .html_to_pdf import render_to_pdf
 
 # Forms
 class LoteForm(ModelForm):
@@ -196,6 +198,7 @@ def cria_lote(request, template_name='catalogo/lote_form.html'):
 
         lote.valor_minimo_de_lote = 0
         lote.valor_minimo_por_lance = 0
+        lote.pago = False
 
         if lote.valor_minimo_de_reserva <= 1000:
             lote.taxa_de_comissao = 1/100
@@ -211,6 +214,28 @@ def cria_lote(request, template_name='catalogo/lote_form.html'):
         lote.save()
         return redirect('catalogo:detalha_lote', pk=lote.id)
     return render(request, template_name, {'form':form})
+
+@login_required
+@vendedor_required
+def paga_lote(request, pk, template_name='catalogo/pagamento.html'):
+    if request.user.is_superuser or get_tipo_usuario(request.user) == 'L':
+        lote= get_object_or_404(Lote, pk=pk)
+    else:
+        lote= get_object_or_404(Lote, pk=pk, vendedor=request.user)
+
+    valor = lote.valor_minimo_de_reserva * lote.taxa_de_comissao
+
+    data = {}
+    data['valor'] = valor
+    data['lote'] = lote
+
+    if request.method == "POST":
+        lote.pago = True
+
+        lote.save()
+        return redirect('catalogo:detalha_lote', pk=pk)
+
+    return render(request, template_name, data)
 
 @login_required
 @vendedor_required
@@ -329,9 +354,13 @@ def inicia_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
 @login_required
 @leiloeiro_required
 def encerra_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
-    leilao= get_object_or_404(Leilao, pk=pk)
+    leilao = get_object_or_404(Leilao, pk=pk)
     
-    leilao.status = 'F'
+    if len(list(Lance.objects.filter(leilao_id = leilao.id))) > 0:
+        leilao.status = 'F'
+    else:
+        leilao.status = 'C'
+
     leilao.save()
 
     return redirect('catalogo:detalha_leilao', pk=pk)
@@ -434,6 +463,7 @@ def gera_relatorio_desempenho_geral(request, template_name='catalogo/gera_relato
 @leiloeiro_required
 def gera_relatorio_faturamento_geral(request, template_name='catalogo/gera_relatorio_faturamento_geral.html'):
     leiloes_finalizados = list(Leilao.objects.filter(status='F'))
+    lotes_pagos = list(Lote.objects.filter(pago=1))
 
     data = {}
     data['faturamento_total'] = 0
@@ -457,9 +487,62 @@ def gera_relatorio_faturamento_geral(request, template_name='catalogo/gera_relat
             taxa_de_comissao = 5/100
 
         data['comissoes_pagas_por_compradores'] += maior_lance.valor * taxa_de_comissao
-        data['comissoes_pagas_por_vendedores'] += leilao.lote.valor_minimo_de_reserva * leilao.lote.taxa_de_comissao
+    
+    for lote in lotes_pagos:
+        data['comissoes_pagas_por_vendedores'] += lote.valor_minimo_de_reserva * lote.taxa_de_comissao
 
     data['faturamento_total'] = data['comissoes_pagas_por_compradores'] + data['comissoes_pagas_por_vendedores']
         
-
     return render(request, template_name, data)
+
+def gera_relatorio_pdf_desempenho_geral(request, template_name='catalogo/gera_relatorio_desempenho_geral.html'):
+    leiloes_finalizados = list(Leilao.objects.filter(status='F'))
+
+    data = {}
+    data['leiloes_totais'] = len(list(Leilao.objects.all()))
+    data['lotes_totais'] = len(list(Lance.objects.all()))
+    data['lances_totais'] = len(list(Lote.objects.all()))
+    data['usuarios_cadastrados'] = len(list(CustomUser.objects.all()))
+
+    data['leiloes_ativos'] = len(list(Leilao.objects.filter(status='A')))
+    data['leiloas_cancelados'] = len(list(Leilao.objects.filter(status='C')))
+    data['leiloes_finalizados'] = len(list(Leilao.objects.filter(status='F')))
+    data['leiloes_nao_iniciados'] = len(list(Leilao.objects.filter(status='N')))
+
+    pdf = render_to_pdf(template_name, data)
+    return HttpResponse(pdf, content_type='application/pdf')
+
+def gera_relatorio_pdf_faturamento_geral(request, template_name='catalogo/gera_relatorio_faturamento_geral.html'):
+    leiloes_finalizados = list(Leilao.objects.filter(status='F'))
+    lotes_pagos = list(Lote.objects.filter(pago=1))
+
+    data = {}
+    data['faturamento_total'] = 0
+    data['comissoes_pagas_por_compradores'] = 0
+    data['comissoes_pagas_por_vendedores'] = 0
+    data['valor_total_de_lances'] = 0
+
+    for leilao in leiloes_finalizados:
+        lista_de_lances = sorted(Lance.objects.filter(leilao_id = leilao.id), key=lambda t: t.valor, reverse=True)
+        maior_lance = lista_de_lances[0] if lista_de_lances else None
+
+        if maior_lance.valor <= 1000:
+            taxa_de_comissao = 1/100
+        elif maior_lance.valor <= 10000:
+            taxa_de_comissao = 2/100
+        elif maior_lance.valor <= 50000:
+            taxa_de_comissao = 3/100
+        elif maior_lance.valor <= 100000:
+            taxa_de_comissao = 4/100
+        else:
+            taxa_de_comissao = 5/100
+
+        data['comissoes_pagas_por_compradores'] += maior_lance.valor * taxa_de_comissao
+    
+    for lote in lotes_pagos:
+        data['comissoes_pagas_por_vendedores'] += lote.valor_minimo_de_reserva * lote.taxa_de_comissao
+
+    data['faturamento_total'] = data['comissoes_pagas_por_compradores'] + data['comissoes_pagas_por_vendedores']
+    pdf = render_to_pdf(template_name, data)
+    return HttpResponse(pdf, content_type='application/pdf')
+

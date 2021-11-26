@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 id="tcolor">Pagamento</h2>
+
+<div class="detalha-lote"> 
+    <form method="post"> {% csrf_token %}
+        <h3>Você deve pagar R${{ valor }} para completar esta ação.</h3>
+
+        <br/>
+
+        <label for="cartao">Digite seu cartão:</label>
+        <input id="cartao" type="number" name="cartao" min="0" required />
+        <div class="botao-pagamento">
+            <div class="botao-pagar">
+                <input class="small-button" type="submit" value="Pagar" />
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

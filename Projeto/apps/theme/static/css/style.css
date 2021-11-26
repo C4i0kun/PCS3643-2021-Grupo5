@@ -224,7 +224,7 @@ p.button {
     color: #363636;
 }
 
-p.small-button {
+p.small-button input.small-button {
     width: 100%;
     font-size: 12px;
     font-weight: bold;
@@ -288,6 +288,25 @@ div.detalha-lote-botao-lateral {
 div.detalha-lote-botao-central {
     margin-left: 2px;
     margin-right: 2px;
+    box-sizing: border-box;
+    flex-grow: 1;
+}
+
+div.botao-pagamento {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+}
+
+div.botao-pagar {
+    margin-left: 2px;
+    margin-right: 2px;
+    display: inline-block;
     box-sizing: border-box;
     flex-grow: 1;
 }

@@ -6,13 +6,13 @@
 
 <form method="post">{% csrf_token %}
     <label for="valor_minimo_de_lote">Valor Mínimo de Lote: </label>
-    <input id="valor_minimo_de_lote" type="number" name="valor_minimo_de_lote" value="{{ valor_minimo_de_lote_atual }}">
+    <input id="valor_minimo_de_lote" type="number" name="valor_minimo_de_lote" value="{{ valor_minimo_de_lote_atual }}" required>
 
     <br/>
     <br/>
 
     <label for="valor_minimo_por_lance">Valor Mínimo por Lance: </label>
-    <input id="valor_minimo_por_lance" type="number" name="valor_minimo_por_lance" value="{{ valor_minimo_por_lance_atual }}">
+    <input id="valor_minimo_por_lance" type="number" name="valor_minimo_por_lance" value="{{ valor_minimo_por_lance_atual }}" required>
     
     <br/>
 

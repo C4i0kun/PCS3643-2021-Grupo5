@@ -9,6 +9,7 @@ urlpatterns = [
   path('lote/', views.lista_lote, name='lista_lote'),
   path('lote/new/', views.cria_lote, name='cria_lote'),
   path('lote/<int:pk>/', views.detalha_lote, name='detalha_lote'),
+  path('lote/pay/<int:pk>/', views.paga_lote, name='paga_lote'),
   path('lote/edit/<int:pk>/', views.atualiza_lote, name='atualiza_lote'),
   path('lote/insert/<int:pk>/', views.insere_valores, name='insere_valores'),
   path('lote/delete/<int:pk>/', views.deleta_lote, name='deleta_lote'),
@@ -26,4 +27,6 @@ urlpatterns = [
   path('relatorio/faturamento/<int:id_leilao>/', views.gera_relatorio_faturamento, name='gera_relatorio_faturamento'),
   path('relatorio/desempenho/', views.gera_relatorio_desempenho_geral, name='gera_relatorio_desempenho_geral'),
   path('relatorio/faturamento/', views.gera_relatorio_faturamento_geral, name='gera_relatorio_faturamento_geral'),
+  path('relatorio/desempenho/download', views.gera_relatorio_pdf_desempenho_geral, name='gera_relatorio_pdf_desempenho_geral'),
+  path('relatorio/faturamento/download', views.gera_relatorio_pdf_faturamento_geral, name='gera_relatorio_pdf_faturamento_geral'),
 ]

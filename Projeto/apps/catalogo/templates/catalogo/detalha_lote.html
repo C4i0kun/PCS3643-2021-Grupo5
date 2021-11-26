@@ -15,6 +15,7 @@
         
         <li>Valor mínimo de reserva: R$ {{ lote.valor_minimo_de_reserva }}</li>
         <li>Taxa de Comissão:{{ lote.taxa_de_comissao }}</li>
+        <li>Pago:{{ lote.pago }}</li>
 
         <br/>
 
@@ -29,21 +30,28 @@
 
     <div class="detalha-lote-botoes">
         {% if tipo_usuario == 'L' or tipo_usuario == 'A' %}
-        {% if lote.valor_minimo_de_lote != 0 %}
+        {% if lote.valor_minimo_de_lote != 0 and lote.pago == True %}
         <div class="detalha-lote-botao-lateral">
             <a href="{% url 'catalogo:cria_leilao' lote.id %}"><p class="small-button">Cria Leilão</p></a>
         </div>
         {% endif %}
         {% endif %}
         {% if tipo_usuario == 'V' or tipo_usuario == 'A' %}
+        {% if lote.pago != True %}
+        <div class="detalha-lote-botao-central">
+            <a href="{% url 'catalogo:paga_lote' lote.id %}"><p class="small-button">Pagar Lote</p></a>
+        </div>
+        {% endif %}
         <div class="detalha-lote-botao-central">
             <a href="{% url 'catalogo:atualiza_lote' lote.id %}"><p class="small-button">Editar Detalhes</p></a>
         </div>
         {% endif %}
         {% if tipo_usuario == 'L' or tipo_usuario == 'A' %}
+        {% if lote.pago == True %}
         <div class="detalha-lote-botao-central">
             <a href="{% url 'catalogo:insere_valores' lote.id %}"><p class="small-button">Inserir Valores</p></a>
         </div>
+        {% endif %}
         {% endif %}
         <div class="detalha-lote-botao-lateral">
             <a href="{% url 'catalogo:deleta_lote' lote.id %}"><p class="small-button">Deletar</p></a>

@@ -47,6 +47,8 @@ class Lote(models.Model):
     valor_minimo_de_reserva = models.FloatField()
     valor_minimo_por_lance = models.FloatField()
 
+    pago = models.BooleanField()
+
     vendedor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
