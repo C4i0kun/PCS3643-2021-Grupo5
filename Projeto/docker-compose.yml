@@ -42,7 +42,7 @@ services: # the different images that will be running as containers
       # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - my-db:/var/lib/mysql
     environment: # access credentials from the .env file
-      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=leilaoDB
       # - PGPORT=5432
       - MYSQL_USER=PCS3643
