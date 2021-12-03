@@ -17,7 +17,7 @@ services: # the different images that will be running as containers
     command: sh -c "python apps/manage.py makemigrations &&
                     python apps/manage.py migrate &&
                     python apps/manage.py createsuperuser --no-input &&
-                    gunicorn locallibrary.wsgi:application --bind 0.0.0.0:8000" # Django commands to run app using gunicorn
+                    gunicorn apps.apps.wsgi:application --bind 0.0.0.0:8000" # Django commands to run app using gunicorn
     volumes:
       - .:/microservice # map data and files from parent directory in host to microservice directory in docker container
       - static_volume:/home/app/microservice/static
