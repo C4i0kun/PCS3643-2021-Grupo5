@@ -26,7 +26,8 @@ SECRET_KEY = '0ux_%=7!81&z=^uj5iw@tue#7zkfn9lk)=*d147(g+$5t$l9nz'
 DEBUG = True
 
 ALLOWED_HOSTS = ['nginx-pcs3643-c4i0kun.cloud.okteto.net',
-                 'nginx-pcs3643-berbardo.cloud.okteto.net']
+                 'nginx-pcs3643-berbardo.cloud.okteto.net',
+                 'nginx-vaifuncionar-berbardo.cloud.okteto.net']
 
 
 # Application definition
