@@ -9,7 +9,7 @@ services: # the different images that will be running as containers
       - static_volume:/home/app/microservice/static # provide a space for static files
     depends_on:
       - web # will only start if web is up and running
-    restart: "on-failure" # restart service when it fails
+    restart: always # restart service when it fails
   
   web: # service name
     build: . #build the image for the web service from the dockerfile in parent directory.
@@ -32,7 +32,7 @@ services: # the different images that will be running as containers
 
     expose: # expose the port to other services defined here so that they can access this service via the exposed port. In the case of Django, this is 8000 by default
       - '8000' # hardcoded port
-    restart: "on-failure"
+    restart: always
     depends_on: # cannot start if db service is not up and running
       - db
   
@@ -42,12 +42,12 @@ services: # the different images that will be running as containers
       # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - my-db:/var/lib/mysql
     environment: # access credentials from the .env file
-      - MYSQL_ROOT_PASSWORD='password'
+      - MYSQL_ROOT_PASSWORD=
       - MYSQL_DATABASE=leilaoDB
       # - PGPORT=5432
       - MYSQL_USER=PCS3643
       - MYSQL_PASSWORD=caibardo123
-    restart: "on-failure"
+    restart: always
     ports:
       # <Port exposed> : < MySQL Port running inside container>
       - '3306:3306'
