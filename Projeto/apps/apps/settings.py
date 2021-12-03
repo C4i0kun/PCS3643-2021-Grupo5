@@ -27,8 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['nginx-pcs3643-c4i0kun.cloud.okteto.net',
                  'nginx-pcs3643-berbardo.cloud.okteto.net',
-                 'nginx-blabla4-c4i0kun.cloud.okteto.net',
-                 'nginx-junior-berbardo.cloud.okteto.net']
+                 'nginx-blabla5-c4i0kun.cloud.okteto.net',
+                 'nginx-junia-berbardo.cloud.okteto.net',
+                 '.cloud.okteto.net']
 
 
 # Application definition
