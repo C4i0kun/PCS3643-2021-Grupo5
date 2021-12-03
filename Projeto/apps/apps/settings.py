@@ -82,7 +82,7 @@ DATABASES = {
         'NAME': 'leilaoDB',
         'USER': 'PCS3643',
         'PASSWORD': 'caibardo123',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '3306',
     }
 }

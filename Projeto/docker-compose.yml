@@ -35,6 +35,8 @@ services: # the different images that will be running as containers
     restart: always
     depends_on: # cannot start if db service is not up and running
       - db
+    links:
+      - db
   
   db: # service name
     image: mysql:8.0.27
