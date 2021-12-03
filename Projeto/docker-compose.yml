@@ -15,8 +15,8 @@ services: # the different images that will be running as containers
     build: . #build the image for the web service from the dockerfile in parent directory.
     # command directive passes the parameters to the service and they will be executed by the service. In this example, these are django commands which will be executed in the container where django lives.
     command: sh -c "python apps/manage.py makemigrations &&
-                    python apps/manage.py createsuperuser --no-input &&
                     python apps/manage.py migrate &&
+                    python apps/manage.py createsuperuser --no-input &&
                     gunicorn locallibrary.wsgi:application --bind 0.0.0.0:8000" # Django commands to run app using gunicorn
     volumes:
       - .:/microservice # map data and files from parent directory in host to microservice directory in docker container
