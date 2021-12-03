@@ -2,6 +2,7 @@
 FROM python:3.8.10
 # setup environment variable
 ENV DockerHOME=/home/app/webapp
+RUN addgroup -S $APP_USER && adduser -S $APP_USER -G $APP_USER
 
 # set work directory
 RUN mkdir -p $DockerHOME
