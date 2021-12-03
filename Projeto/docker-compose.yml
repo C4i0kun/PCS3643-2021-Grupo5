@@ -44,8 +44,8 @@ services: # the different images that will be running as containers
     environment: # access credentials from the .env file
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=leilaoDB
-      # - PGPORT=5432
       - MYSQL_USER=PCS3643
+      - MYSQL_TCP_PORT=3306
       - MYSQL_PASSWORD=caibardo123
     restart: always
     ports:
