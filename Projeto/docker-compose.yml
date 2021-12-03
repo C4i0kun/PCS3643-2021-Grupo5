@@ -47,7 +47,7 @@ services: # the different images that will be running as containers
       - MYSQL_PASSWORD=caibardo123
     restart: "on-failure"
   
-# volumes:
-#   postgres_data:
-#   static_volume:
+volumes:
+  # postgres_data:
+  static_volume:
   
