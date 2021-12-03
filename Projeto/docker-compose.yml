@@ -37,19 +37,25 @@ services: # the different images that will be running as containers
       - db
   
   db: # service name
-    image: mysql
-    # volumes:
-    #   - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    #   - postgres_data:/var/lib/postgresql/data/
+    image: mysql:8.0.27
+    volumes:
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - my-db:/var/lib/mysql
     environment: # access credentials from the .env file
-      - MYSQL_ROOT_PASSWORD=caibardo123
+      - MYSQL_ROOT_PASSWORD='password'
       - MYSQL_DATABASE=leilaoDB
       # - PGPORT=5432
       - MYSQL_USER=PCS3643
       - MYSQL_PASSWORD=caibardo123
     restart: "on-failure"
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - '3306:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3306'
   
 volumes:
-  # postgres_data:
+  my-db:
   static_volume:
   
