@@ -7,6 +7,14 @@
 | Bernardo Rocha Coutinho     | 11288235 |
 | Caio de Souza Barbosa Costa | 11257734 |
 
+### 🏗️ Projeto
+
+ - **[Acesse o projeto por este link](Projeto)**
+
+### 📝 Documentação Final
+
+ - **[Acesse a documentação final por este link](Documentação%20Final)**
+
 ### 👩‍🏫 Aulas
 
  - **[Aula 1 - Workshop de Requisitos](Aula1)**
@@ -20,4 +28,4 @@
  - **[Aula 9 - Implementação II: Codificação e Testes de Unidade](Aula9)**
  - **[Aula 10 - Testes I: Testes de Integração](Aula10)**
  - **[Aula 11 - Testes II: Testes de Integração](Aula11)**
- - **[Aula 12 Testes III: Testes de Validação](Aula12)**
+ - **[Aula 12 - Testes III: Testes de Validação](Aula12)**
