@@ -5,19 +5,27 @@
 <h2 id="tcolor">Pagamento</h2>
 
 <div class="detalha-lote"> 
-    <form method="post"> {% csrf_token %}
-        <h3>Você deve pagar R${{ valor }} para completar esta ação.</h3>
+    <div class="pagamento">
+        <form method="post"> {% csrf_token %}
+            <h3>Você deve pagar R${{ valor }} para completar esta ação.</h3>
 
-        <br/>
+            <br/>
 
-        <label for="cartao">Digite seu cartão:</label>
-        <input id="cartao" type="number" name="cartao" min="0" required />
-        <div class="botao-pagamento">
-            <div class="botao-pagar">
-                <input class="small-button" type="submit" value="Pagar" />
+            <label for="cartao">Digite seu cartão:</label>
+            
+            <br/>
+            <br/>
+            
+            <input id="cartao" type="number" name="cartao" min="0" required />
+
+            <br/>
+            <br/>
+
+            <div class="botao-pagamento">
+                <input class="button" type="submit" value="Pagar" />
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 {% endblock %}

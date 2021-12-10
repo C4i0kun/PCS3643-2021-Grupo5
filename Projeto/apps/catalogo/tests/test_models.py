@@ -1,5 +1,6 @@
 from django.test import TestCase
 from datetime import datetime, timezone, timedelta
+import pytz
 
 # Create your tests here.
 
@@ -107,8 +108,8 @@ class LeilaoModelTest(TestCase):
                                    vendedor=self.usuario_vendedor)
 
         self.leilao = Leilao.objects.create(name="Leilão do Caio", 
-                              periodoInicio=datetime.now(timezone.utc) + timedelta(hours=1),
-                              periodoFinal=datetime.now(timezone.utc) + timedelta(days=3),
+                              periodoInicio=datetime.now(pytz.timezone('America/Sao_Paulo')) + timedelta(hours=1),
+                              periodoFinal=datetime.now(pytz.timezone('America/Sao_Paulo')) + timedelta(days=3),
                               lote=self.lote)
 
     def test_nome_do_objeto(self):
@@ -145,8 +146,8 @@ class LanceModelTest(TestCase):
                                    vendedor=self.usuario_vendedor)
 
         self.leilao = Leilao.objects.create(name="Leilão do Caio", 
-                              periodoInicio=datetime.now(timezone.utc) + timedelta(hours=1),
-                              periodoFinal=datetime.now(timezone.utc) + timedelta(days=3),
+                              periodoInicio=datetime.now(pytz.timezone('America/Sao_Paulo')) + timedelta(hours=1),
+                              periodoFinal=datetime.now(pytz.timezone('America/Sao_Paulo')) + timedelta(days=3),
                               lote=self.lote)
 
         self.lance = Lance.objects.create(valor=2199.99, comprador=self.usuario_comprador, leilao=self.leilao)

@@ -5,9 +5,12 @@ from django.utils.timezone import utc
 from django.utils.translation import ugettext_lazy as _
 from django.forms import ModelForm
 from django.http import HttpResponse
+from django import forms
 
 from datetime import datetime, timezone, timedelta
+import pytz
 
+from .utils import cria_usuarios, checa_status_leiloes
 from .models import CustomUser, Lote, Leilao, Lance
 from .permissions import comprador_required, vendedor_required, leiloeiro_required, vendedor_or_leiloeiro_required, get_tipo_usuario
 from .html_to_pdf import render_to_pdf
@@ -17,6 +20,24 @@ class LoteForm(ModelForm):
     class Meta:
         model = Lote
         fields = ['name', 'descricao', 'estado', 'valor_minimo_de_reserva']
+
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': "form-control",
+                # 'style': 'max-width: 300px;',
+                'placeholder': 'Nome'
+                }),
+            'descricao': forms.TextInput(attrs={
+                'class': "form-control", 
+                # 'style': 'max-width: 300px;',
+                'placeholder': 'Descrição'
+                }),
+            'valor_minimo_de_reserva': forms.NumberInput(attrs={
+                'class': "form-control", 
+                # 'style': 'max-width: 300px;',
+                'placeholder': 'Valor Mínimo de Reserva'
+                })
+        }
 
     # def clean_valor_minimo_de_lote(self):
     #     valor_minimo_de_lote = self.cleaned_data['valor_minimo_de_lote']
@@ -53,7 +74,25 @@ class LoteForm(ModelForm):
 class LeilaoForm(ModelForm):
     class Meta:
         model = Leilao
-        fields = ['name', 'periodoInicio', 'periodoFinal']  
+        fields = ['name', 'periodoInicio', 'periodoFinal']
+        
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': "form-control",
+                # 'style': 'max-width: 300px;',
+                'placeholder': 'Nome'
+                }),
+            'periodoInicio': forms.TextInput(attrs={
+                'class': "form-control", 
+                # 'style': 'max-width: 300px;',
+                'placeholder': 'Exemplo: 2022-01-25 18:00:00'
+                }),
+            'periodoFinal': forms.NumberInput(attrs={
+                'class': "form-control", 
+                # 'style': 'max-width: 300px;',
+                'placeholder': 'Exemplo: 2022-01-29 18:00:00'
+                })
+        }
 
     def clean_periodoInicio(self):
         periodoInicio = self.cleaned_data['periodoInicio']
@@ -70,11 +109,11 @@ class LeilaoForm(ModelForm):
             periodoFinal_dt = periodoFinal
 
         # Checa se o início do período é posterior ao horário atual.
-        if periodoInicio_dt.replace(tzinfo=utc) < datetime.now(timezone.utc):
+        if periodoInicio_dt.replace(tzinfo=pytz.timezone('America/Sao_Paulo')) < datetime.now(pytz.timezone('America/Sao_Paulo')).replace(tzinfo=pytz.timezone('America/Sao_Paulo')):
             raise ValidationError(_('Início do período do leilão deve ser posterior ao horário atual.'))
 
         # Checa se o início do período é anterior ao final do período.
-        if periodoInicio_dt.replace(tzinfo=utc) >= periodoFinal_dt.replace(tzinfo=utc):
+        if periodoInicio_dt.replace(tzinfo=pytz.timezone('America/Sao_Paulo')) >= periodoFinal_dt.replace(tzinfo=pytz.timezone('America/Sao_Paulo')):
             raise ValidationError(_('Início do período do leilão deve ser anterior ao final do período do leilão.'))
 
         return periodoInicio
@@ -94,11 +133,11 @@ class LeilaoForm(ModelForm):
             periodoFinal_dt = periodoFinal
 
         # Checa se o início do período é posterior ao horário atual.
-        if periodoFinal_dt.replace(tzinfo=utc) < datetime.now(timezone.utc) + timedelta(days=1):
+        if periodoFinal_dt.replace(tzinfo=pytz.timezone('America/Sao_Paulo')) < datetime.now(pytz.timezone('America/Sao_Paulo')).replace(tzinfo=pytz.timezone('America/Sao_Paulo')) + timedelta(days=1):
             raise ValidationError(_('Final do período do leilão deve ser posterior ao horário atual mais um dia.'))
 
         # Checa se o início do período é anterior ao final do período.
-        if periodoFinal_dt.replace(tzinfo=utc) < periodoInicio_dt.replace(tzinfo=utc) + timedelta(days=1):
+        if periodoFinal_dt.replace(tzinfo=pytz.timezone('America/Sao_Paulo')) < periodoInicio_dt.replace(tzinfo=pytz.timezone('America/Sao_Paulo')) + timedelta(days=1):
             raise ValidationError(_('Final do período do leilão deve ser posterior ao início do período do leilão mais um dia.'))
 
         return periodoFinal
@@ -146,6 +185,8 @@ class LanceForm(ModelForm):
 def principal(request, template_name='catalogo/principal.html'):
     
     lances = Lance.objects.all()
+
+    cria_usuarios()
 
     data = {}
     data['lista_de_leiloes_ativos'] = Leilao.objects.filter(status='A')
@@ -286,6 +327,8 @@ def deleta_lote(request, pk, template_name='catalogo/lote_confirma_delecao.html'
 # funções dos leilões
 @login_required
 def lista_leilao(request, template_name='catalogo/lista_leilao.html'):
+    checa_status_leiloes()
+
     leiloes = Leilao.objects.all()
     leiloes_nao_iniciados = Leilao.objects.filter(status='N')
     leiloes_ativos = Leilao.objects.filter(status='A')
@@ -306,24 +349,37 @@ def lista_leilao(request, template_name='catalogo/lista_leilao.html'):
 @login_required
 @leiloeiro_required
 def cria_leilao(request, id_lote, template_name='catalogo/leilao_form.html'):
+    checa_status_leiloes()
+
     form = LeilaoForm(request.POST or None)
     if form.is_valid():
         leilao = form.save(commit=False)
         lote = get_object_or_404(Lote, pk=id_lote)
         leilao.lote = lote
         leilao.status = "N"
+        leilao.pago = False
         leilao.save()
         return redirect('catalogo:detalha_leilao', pk=leilao.id)
     return render(request, template_name, {'form':form})
 
 @login_required
 def detalha_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
+    checa_status_leiloes()
+
     leilao= get_object_or_404(Leilao, pk=pk)
     lances = Lance.objects.all()
+    lista_de_lances = sorted(lances, key=lambda t: t.valor, reverse=True)
+
+    comprador_maior_lance = ''
+
+    if lista_de_lances:
+        comprador_maior_lance = sorted(lista_de_lances, key=lambda t: t.valor, reverse=True)[0].comprador.username
 
     data = {}
     data['leilao'] = leilao
-    data['lista_de_lances'] = sorted(lances, key=lambda t: t.valor, reverse=True)
+    data['lista_de_lances'] = lista_de_lances
+    data['comprador'] = comprador_maior_lance
+    data['usuario'] = request.user.username
     data['tipo_usuario'] = get_tipo_usuario(request.user) 
     data['status'] = leilao.STATUS_DICT[leilao.status]
     data['estado'] = leilao.lote.ESTADO_DICT[leilao.lote.estado]
@@ -333,6 +389,8 @@ def detalha_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
 @login_required
 @leiloeiro_required
 def atualiza_leilao(request, pk, template_name='catalogo/leilao_form.html'):
+    checa_status_leiloes()
+
     leilao= get_object_or_404(Leilao, pk=pk)
     
     form = LeilaoForm(request.POST or None, instance=leilao)
@@ -344,6 +402,8 @@ def atualiza_leilao(request, pk, template_name='catalogo/leilao_form.html'):
 @login_required
 @leiloeiro_required
 def inicia_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
+    checa_status_leiloes()
+
     leilao= get_object_or_404(Leilao, pk=pk)
     
     leilao.status = 'A'
@@ -354,9 +414,18 @@ def inicia_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
 @login_required
 @leiloeiro_required
 def encerra_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
+    checa_status_leiloes()
+
     leilao = get_object_or_404(Leilao, pk=pk)
+
+    lista_de_lances = list(Lance.objects.filter(leilao_id = leilao.id))
+
+    maior_lance = 0
+
+    if lista_de_lances:
+        maior_lance = sorted(lista_de_lances, key=lambda t: t.valor, reverse=True)[0].valor
     
-    if len(list(Lance.objects.filter(leilao_id = leilao.id))) > 0:
+    if len(lista_de_lances) > 0 and maior_lance >= leilao.lote.valor_minimo_de_reserva:
         leilao.status = 'F'
     else:
         leilao.status = 'C'
@@ -368,6 +437,8 @@ def encerra_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
 @login_required
 @leiloeiro_required
 def cancela_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
+    checa_status_leiloes()
+
     leilao= get_object_or_404(Leilao, pk=pk)
     
     leilao.status = 'C'
@@ -378,6 +449,8 @@ def cancela_leilao(request, pk, template_name='catalogo/detalha_leilao.html'):
 @login_required
 @leiloeiro_required
 def deleta_leilao(request, pk, template_name='catalogo/leilao_confirma_delecao.html'):
+    checa_status_leiloes()
+    
     leilao= get_object_or_404(Leilao, pk=pk)
     
     if request.method=='POST':
@@ -388,6 +461,8 @@ def deleta_leilao(request, pk, template_name='catalogo/leilao_confirma_delecao.h
 @login_required
 @comprador_required
 def faz_lance(request, id_leilao, template_name='catalogo/lance_form.html'):
+    checa_status_leiloes()
+
     form = LanceForm(request.POST or None, leilao=get_object_or_404(Leilao, pk=id_leilao))
     if form.is_valid():
         lance = form.save(commit=False)
@@ -398,9 +473,44 @@ def faz_lance(request, id_leilao, template_name='catalogo/lance_form.html'):
         return redirect('catalogo:detalha_leilao', pk=id_leilao)
     return render(request, template_name, {'form':form})
 
+
+@login_required
+@comprador_required
+def paga_leilao(request, pk, template_name='catalogo/pagamento.html'):
+    leilao= get_object_or_404(Leilao, pk=pk)
+
+    lista_de_lances = list(Lance.objects.filter(leilao_id = leilao.id))
+
+    maior_lance = sorted(lista_de_lances, key=lambda t: t.valor, reverse=True)[0]
+
+    if maior_lance.valor <= 1000:
+        taxa_de_comissao = 1/100
+    elif maior_lance.valor <= 10000:
+        taxa_de_comissao = 2/100
+    elif maior_lance.valor <= 50000:
+        taxa_de_comissao = 3/100
+    elif maior_lance.valor <= 100000:
+        taxa_de_comissao = 4/100
+    else:
+        taxa_de_comissao = 5/100
+
+    valor = maior_lance.valor * (1 + taxa_de_comissao)
+
+    data = {}
+    data['valor'] = valor
+
+    if request.method == "POST":
+        leilao.pago = True
+
+        leilao.save()
+        return redirect('catalogo:detalha_leilao', pk=pk)
+
+    return render(request, template_name, data)
+
 @login_required
 @leiloeiro_required
 def gera_relatorio(request, id_leilao, template_name='catalogo/gera_relatorio.html'):
+    checa_status_leiloes()
 
     data = {}
     data['leilao_id'] = id_leilao
@@ -410,6 +520,8 @@ def gera_relatorio(request, id_leilao, template_name='catalogo/gera_relatorio.ht
 @login_required
 @leiloeiro_required
 def gera_relatorio_desempenho(request, id_leilao, template_name='catalogo/gera_relatorio_desempenho.html'):
+    checa_status_leiloes()
+
     leilao= get_object_or_404(Leilao, pk=id_leilao)
 
     lista_de_lances = list(Lance.objects.filter(leilao__id=id_leilao))
@@ -428,6 +540,8 @@ def gera_relatorio_desempenho(request, id_leilao, template_name='catalogo/gera_r
 @login_required
 @leiloeiro_required
 def gera_relatorio_faturamento(request, id_leilao, template_name='catalogo/gera_relatorio_faturamento.html'):
+    checa_status_leiloes()
+
     leilao= get_object_or_404(Leilao, pk=id_leilao)
 
     lista_de_lances = list(Lance.objects.filter(leilao__id=id_leilao))
@@ -445,6 +559,7 @@ def gera_relatorio_faturamento(request, id_leilao, template_name='catalogo/gera_
 @login_required
 @leiloeiro_required
 def gera_relatorio_desempenho_geral(request, template_name='catalogo/gera_relatorio_desempenho_geral.html'):
+    checa_status_leiloes()
 
     data = {}
     data['leiloes_totais'] = len(list(Leilao.objects.all()))
@@ -462,6 +577,8 @@ def gera_relatorio_desempenho_geral(request, template_name='catalogo/gera_relato
 @login_required
 @leiloeiro_required
 def gera_relatorio_faturamento_geral(request, template_name='catalogo/gera_relatorio_faturamento_geral.html'):
+    checa_status_leiloes()
+
     leiloes_finalizados = list(Leilao.objects.filter(status='F'))
     lotes_pagos = list(Lote.objects.filter(pago=1))
 
@@ -496,6 +613,8 @@ def gera_relatorio_faturamento_geral(request, template_name='catalogo/gera_relat
     return render(request, template_name, data)
 
 def gera_relatorio_pdf_desempenho_geral(request, template_name='catalogo/gera_relatorio_desempenho_geral.html'):
+    checa_status_leiloes()
+
     leiloes_finalizados = list(Leilao.objects.filter(status='F'))
 
     data = {}
@@ -513,6 +632,8 @@ def gera_relatorio_pdf_desempenho_geral(request, template_name='catalogo/gera_re
     return HttpResponse(pdf, content_type='application/pdf')
 
 def gera_relatorio_pdf_faturamento_geral(request, template_name='catalogo/gera_relatorio_faturamento_geral.html'):
+    checa_status_leiloes()
+    
     leiloes_finalizados = list(Leilao.objects.filter(status='F'))
     lotes_pagos = list(Lote.objects.filter(pago=1))
 
@@ -545,4 +666,3 @@ def gera_relatorio_pdf_faturamento_geral(request, template_name='catalogo/gera_r
     data['faturamento_total'] = data['comissoes_pagas_por_compradores'] + data['comissoes_pagas_por_vendedores']
     pdf = render_to_pdf(template_name, data)
     return HttpResponse(pdf, content_type='application/pdf')
-

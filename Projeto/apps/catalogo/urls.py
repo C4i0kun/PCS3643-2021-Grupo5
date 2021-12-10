@@ -16,6 +16,7 @@ urlpatterns = [
   path('leilao/', views.lista_leilao, name='lista_leilao'),
   path('leilao/new/<int:id_lote>/', views.cria_leilao, name='cria_leilao'),
   path('leilao/<int:pk>/', views.detalha_leilao, name='detalha_leilao'),
+  path('leilao/pay/<int:pk>/', views.paga_leilao, name='paga_leilao'),
   path('leilao/edit/<int:pk>/', views.atualiza_leilao, name='atualiza_leilao'),
   path('leilao/init/<int:pk>/', views.inicia_leilao, name='inicia_leilao'),
   path('leilao/cancel/<int:pk>/', views.cancela_leilao, name='cancela_leilao'),

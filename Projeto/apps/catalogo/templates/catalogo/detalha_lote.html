@@ -5,28 +5,46 @@
 <h2><a href="{% url 'catalogo:detalha_lote' lote.id %}">Lote {{ lote.name }}</a></h2>
 
 <div class="detalha-lote">
-    <ul>
-        <li>Nome: {{ lote.name }}</li>
-        <li>Descrição:{{ lote.descricao }}</li>
-        <li>Estado:{{ estado }}</li>
-        <li>Vendedor: {{ lote.vendedor.username }}</li>
-
-        <br/>
-        
-        <li>Valor mínimo de reserva: R$ {{ lote.valor_minimo_de_reserva }}</li>
-        <li>Taxa de Comissão:{{ lote.taxa_de_comissao }}</li>
-        <li>Pago:{{ lote.pago }}</li>
-
-        <br/>
-
+    <p class="item-title">{{ lote.name }}</p>
+    <p class="item-description center"><i>{{ lote.descricao }}</i></p>
+    <hr class="item-title-divider">
+    <table>
+        <tr>
+            <td><b>Estado</b></td>
+            <td>{{ estado }}</td>
+        </tr>
+        <tr>
+            <td><b>Vendedor</b></td>
+            <td>{{ lote.vendedor.username }}</td>
+        </tr>
+        <tr>
+            <td><b>Valor mínimo de reserva</b></td>
+            <td>R$ {{ lote.valor_minimo_de_reserva }}</td>
+        </tr>
+        <tr>
+            <td><b>Taxa de Comissão</b></td>
+            <td>{{ lote.taxa_de_comissao }}</td>
+        </tr>
+        <tr>
+            <td><b>Pago</b></td>
+            <td>{{ lote.pago }}</td>
+        </tr>
         {% if lote.valor_minimo_de_lote != 0 %}
-        <li>Valor mínimo de lote: R$ {{ lote.valor_minimo_de_lote }}</li>
-        <li>Valor mínimo por lance: R$ {{ lote.valor_minimo_por_lance }}</li>
-        {% else %}
-        <p>É necessário que o leiloeiro preencha os valores de lote e por lance do lote.</p>
+        <tr>
+            <td><b>Valor Inicial do Lote</b></td>
+            <td>R$ {{ lote.valor_minimo_de_lote }}</td>
+        </tr>
+        <tr>
+            <td><b>Valor Mínimo por Lance:</b></td>
+            <td>R$ {{ lote.valor_minimo_por_lance }}</td>
+        </tr>
         {% endif %}
-    
-    </ul>
+    </table>
+
+    {% if lote.valor_minimo_de_lote == 0 %}
+    <p class="item-description item-warning">É necessário que o leiloeiro preencha os valores de lote e por lance do lote.</p>
+    {% endif %}
+
 
     <div class="detalha-lote-botoes">
         {% if tipo_usuario == 'L' or tipo_usuario == 'A' %}

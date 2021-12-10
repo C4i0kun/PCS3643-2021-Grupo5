@@ -39,13 +39,13 @@ class Lote(models.Model):
 
     ESTADO_DICT = {"N": "Novo", "S": "Seminovo", "U": "Usado"}
 
-    name = models.CharField(max_length=200)
-    descricao = models.CharField(max_length=1000)
-    estado = models.CharField(max_length=1, choices=ESTADO_CHOICES, blank=False, null=False)
+    name = models.CharField(max_length=200, verbose_name='Nome do Lote')
+    descricao = models.CharField(max_length=1000, verbose_name='Descrição dos Itens do Lote')
+    estado = models.CharField(max_length=1, choices=ESTADO_CHOICES, blank=False, null=False, verbose_name='Estado do Lote')
     taxa_de_comissao = models.FloatField()
-    valor_minimo_de_lote = models.FloatField()
-    valor_minimo_de_reserva = models.FloatField()
-    valor_minimo_por_lance = models.FloatField()
+    valor_minimo_de_lote = models.FloatField(verbose_name='Valor Inicial do Lote')
+    valor_minimo_de_reserva = models.FloatField(verbose_name='Valor Mínimo de Reserva')
+    valor_minimo_por_lance = models.FloatField(verbose_name='Valor Mínimo por Lance')
 
     pago = models.BooleanField()
 
@@ -67,10 +67,12 @@ class Leilao(models.Model):
 
     STATUS_DICT = {"N": "Não iniciado", "A": "Ativo", "C": "Cancelado", "F": "Finalizado"}
 
-    name = models.CharField(max_length=200)
-    periodoInicio = models.DateTimeField()
-    periodoFinal = models.DateTimeField()
+    name = models.CharField(max_length=200, verbose_name='Nome do Leilão')
+    periodoInicio = models.DateTimeField(verbose_name='Dia e Horário de Início do Leilão')
+    periodoFinal = models.DateTimeField(verbose_name='Dia e Horário de Encerramento do Leilão')
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, blank=False, null=False)
+
+    pago = models.BooleanField()
 
     lote = models.ForeignKey(Lote, on_delete=models.CASCADE)
 
@@ -81,7 +83,7 @@ class Leilao(models.Model):
         return reverse('catalogo:detalha_leilao', kwargs={'pk': self.pk})
 
 class Lance(models.Model):
-    valor = models.FloatField()
+    valor = models.FloatField(verbose_name='Valor do Lance')
 
     comprador = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     leilao = models.ForeignKey(Leilao, on_delete=models.CASCADE)

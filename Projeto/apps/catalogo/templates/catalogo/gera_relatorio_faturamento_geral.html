@@ -5,16 +5,25 @@
 <h2 id="tcolor"><a href="{% url 'catalogo:gera_relatorio_faturamento_geral' %}">Relatório de faturamento geral</a></h2>
 
 
-<div class="detalha-lote">
-    <ul>
-        <li>Valor total das comissões pagas por vendedores: R$ {{ comissoes_pagas_por_vendedores }}</li>
-        <br/>
-        <li>Valor total das comissões pagas por compradores: R$ {{ comissoes_pagas_por_compradores }}</li>
-        <br/>
-        <!-- <li>Valor total de todos os lances: R$ {{ valor_total_de_lances }}</li> -->
-        <!-- <br/> -->
-        <li>Faturamento Total: R$ {{ faturamento_total }}</li>
-    </ul>
+<div class="detalha-relatorio">
+    <table>
+        <tr>
+            <th>Indicativo</th>
+            <th>Valor</th>
+        </tr>
+        <tr>
+            <td>Faturamento das comissões dos vendedores</td>
+            <td>R$ {{ comissoes_pagas_por_vendedores }}</td>
+        </tr>
+        <tr>
+            <td>Faturamento das comissões dos compradores</td>
+            <td>R$ {{ comissoes_pagas_por_compradores }}</td>
+        </tr>
+        <tr>
+            <td>Faturamento total</td>
+            <td>R$ {{ faturamento_total }}</td>
+        </tr>
+    </table>
 </div>
 
 <a href="{% url 'catalogo:gera_relatorio_pdf_faturamento_geral' %}"><p class="button">Download</p></a>

@@ -29,7 +29,11 @@ ALLOWED_HOSTS = ['nginx-pcs3643-c4i0kun.cloud.okteto.net',
                  'nginx-pcs3643-berbardo.cloud.okteto.net',
                  'nginx-blabla5-c4i0kun.cloud.okteto.net',
                  'nginx-junia-berbardo.cloud.okteto.net',
-                 '.cloud.okteto.net']
+                 '.cloud.okteto.net',
+                 'localhost',
+                 '127.0.0.1',
+                 'nginx-leiloar-c4i0kun.cloud.okteto.net',
+                 'nginx-leiloar-berbardo.cloud.okteto.net']
 
 
 # Application definition
@@ -86,7 +90,7 @@ DATABASES = {
         'NAME': 'leilaoDB',
         'USER': 'PCS3643',
         'PASSWORD': 'caibardo123',
-        'HOST': 'db',
+        'HOST': 'db', # change to 'db' to deploy
         'PORT': '3306',
     }
 }

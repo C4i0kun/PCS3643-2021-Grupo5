@@ -5,7 +5,7 @@
 <h2 id="tcolor">Insere Valores</h2>
 
 <form method="post">{% csrf_token %}
-    <label for="valor_minimo_de_lote">Valor Mínimo de Lote: </label>
+    <label for="valor_minimo_de_lote">Valor Inicial do Lote: </label>
     <input id="valor_minimo_de_lote" type="number" name="valor_minimo_de_lote" value="{{ valor_minimo_de_lote_atual }}" required>
 
     <br/>

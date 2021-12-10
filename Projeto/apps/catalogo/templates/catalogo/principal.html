@@ -1,34 +1,53 @@
 {% extends "base.html" %}
 
+{% load filter %}
+
 {% block content %}
 
+<div class="buttons-wrapper">
+    {% if tipo_usuario != 'C' %}
+    <div class="button-item">
+        <a href="{% url 'catalogo:lista_lote' %}"><p class="home-button">Ver seus Lotes</p></a>
+    </div>
+    {% endif %}
 
-{% if tipo_usuario != 'C' %}
-<a href="{% url 'catalogo:lista_lote' %}"><p class="button">Ver seus Lotes</p></a>
-{% endif %}
+    <div class="button-item">
+        <a href="{% url 'catalogo:lista_leilao' %}"><p class="home-button">Ver Leilões Ativos</p></a>
+    </div>
 
-<p class="button"><a href="{% url 'catalogo:lista_leilao' %}">Ver Leilões Ativos</a></p>
+    {% if tipo_usuario == 'L' or tipo_usuario == 'A' %}
+    <div class="button-item">
+        <a href="{% url 'catalogo:gera_relatorio_desempenho_geral' %}"><p class="home-button">Ver Relatório Geral de Desempenho</p></a>
+    </div>
+    <div class="button-item">
+        <a href="{% url 'catalogo:gera_relatorio_faturamento_geral' %}"><p class="home-button">Ver Relatório Geral de Faturamento</p></a>
+    </div>
+    {% endif %}
+</div>
 
-{% if tipo_usuario == 'L' or tipo_usuario == 'A' %}
-<a href="{% url 'catalogo:gera_relatorio_desempenho_geral' %}"><p class="button">Ver Relatório Geral de Desempenho</p></a>
-<a href="{% url 'catalogo:gera_relatorio_faturamento_geral' %}"><p class="button">Ver Relatório Geral de Faturamento</p></a>
-{% endif %}
-
-<h3>Alguns Leilões Ativos:</h3>
-<ul class="items">
+<h2>Alguns Leilões Ativos:</h2>
+<div class="items-wrapper">
     {% for leilao in lista_de_leiloes_ativos %}
-    <a href="{% url 'catalogo:detalha_leilao' leilao.id %}">
-    <li class="item"><h4>{{ leilao.name }}</h4>
+    <div class="item">
+        <p class="item-title">{{ leilao.name }}</p>
+        <hr class="item-title-divider">
+        <p class="item-description"><b>Lote:</b> {{leilao.lote.name}}</p>
+        <p class="item-description"><i>{{leilao.lote.descricao}}</i></p>
+        <hr class="item-title-divider">
+        <p class="item-description"><b>Lance Vencedor:</b></p>
+        {% if lista_de_lances|pega_lances_de_leilao:leilao.id|first %}
+        <ul>
+            <li>{{ lista_de_lances|pega_lances_de_leilao:leilao.id|first }}</li> 
+        </ul>
+        {% else %}
+        <ul>
+            <li>Não há lances.</li>
+        </ul>
+        {% endif %}
 
-    <br/>
-
-    <ul>
-        <li>Lote: {{leilao.lote.name}}</li>
-        <li>Descrição: {{leilao.lote.descricao}}</li>
-    </ul>
-    </li>
-    </a>
+        <a href="{% url 'catalogo:detalha_leilao' leilao.id %}"><p class="small-button bottom-anchor">Ver Detalhes</p></a>
+    </div>
     {% endfor %}
-</ul>
+</div>
 
 {% endblock %}

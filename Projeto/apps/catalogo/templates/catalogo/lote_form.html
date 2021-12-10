@@ -6,7 +6,9 @@
 
 <form method="post">{% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Submit" />
+    <div class="buttonHolder">
+        <input type="submit" value="Enviar" />
+    </div>
     <a href="{% url 'catalogo:lista_lote' %}"><p class="button">Cancelar</p></a>
 </form>
 

@@ -4,18 +4,20 @@
 
 <h2><a href="{% url 'catalogo:lista_lote' %}">Lotes disponíveis</a></h2>
 
-<ul>
+<div class="items-wrapper">
     {% for lote in lista_de_lotes_disponiveis %}
-    <li>{{ lote.name }}</li>
-    <ul>
-        <li>Vendedor:  {{ lote.vendedor.username }}</li>
-        <li><a href="{% url 'catalogo:detalha_lote' lote.id %}">Ver Detalhes</a></li>
-    </ul>
+    <div class="item">
+        <p class="item-title">{{ lote.name }}</p>
+        <hr class="item-title-divider">
+        <p class="item-description"> <b>Vendedor:</b>  {{ lote.vendedor.username }}</p>
+        <a href="{% url 'catalogo:detalha_lote' lote.id %}"><p class="small-button bottom-anchor">Ver Detalhes</p></a>
+    </div>
     {% endfor %}
-</ul>
+</div>
 
 {% if tipo_usuario == 'V' or tipo_usuario == 'A' %}
-<a href="{% url 'catalogo:cria_lote' %}">Novo lote</a>
+
+<a href="{% url 'catalogo:cria_lote' %}"><p class="button">Novo lote</p></a>
 {% endif %}
 
 {% endblock %}
