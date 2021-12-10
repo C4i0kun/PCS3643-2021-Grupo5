@@ -87,7 +87,7 @@ class LeilaoForm(ModelForm):
                 # 'style': 'max-width: 300px;',
                 'placeholder': 'Exemplo: 2022-01-25 18:00:00'
                 }),
-            'periodoFinal': forms.NumberInput(attrs={
+            'periodoFinal': forms.TextInput(attrs={
                 'class': "form-control", 
                 # 'style': 'max-width: 300px;',
                 'placeholder': 'Exemplo: 2022-01-29 18:00:00'
