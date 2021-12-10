@@ -24,29 +24,17 @@ class LoteForm(ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': "form-control",
-                # 'style': 'max-width: 300px;',
                 'placeholder': 'Nome'
                 }),
             'descricao': forms.TextInput(attrs={
                 'class': "form-control", 
-                # 'style': 'max-width: 300px;',
                 'placeholder': 'Descrição'
                 }),
             'valor_minimo_de_reserva': forms.NumberInput(attrs={
                 'class': "form-control", 
-                # 'style': 'max-width: 300px;',
                 'placeholder': 'Valor Mínimo de Reserva'
                 })
         }
-
-    # def clean_valor_minimo_de_lote(self):
-    #     valor_minimo_de_lote = self.cleaned_data['valor_minimo_de_lote']
-
-    #     # Checa se o valor mínimo do lote é superior a zero.
-    #     if float(valor_minimo_de_lote) <= 0:
-    #         raise ValidationError(_('Valor mínimo do lote deve ser superior a 0.'))
-
-    #     return valor_minimo_de_lote
      
     def clean_valor_minimo_de_reserva(self):
         # valor_minimo_de_lote = self.data['valor_minimo_de_lote']
@@ -56,20 +44,7 @@ class LoteForm(ModelForm):
         if float(valor_minimo_de_reserva) <= 0:
             raise ValidationError(_('Valor mínimo de reserva deve ser superior a 0.'))
 
-        # # Checa se o valor mínimo de reserva é superior ao valor mínimo de lote.
-        # if float(valor_minimo_de_reserva) <= float(valor_minimo_de_lote):
-        #     raise ValidationError(_('Valor mínimo de reserva deve ser superior ao valor mínimo do lote.'))
-
         return valor_minimo_de_reserva
-    
-    # def clean_valor_minimo_por_lance(self):
-    #     valor_minimo_por_lance = self.cleaned_data['valor_minimo_por_lance']
-
-    #     # Checa se o valor mínimo por lance é superior a zero.
-    #     if float(valor_minimo_por_lance) <= 0:
-    #         raise ValidationError(_('Valor mínimo por lance deve ser superior a 0.'))
-
-    #     return valor_minimo_por_lance
 
 class LeilaoForm(ModelForm):
     class Meta:
@@ -79,17 +54,14 @@ class LeilaoForm(ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': "form-control",
-                # 'style': 'max-width: 300px;',
                 'placeholder': 'Nome'
                 }),
             'periodoInicio': forms.TextInput(attrs={
                 'class': "form-control", 
-                # 'style': 'max-width: 300px;',
                 'placeholder': 'Exemplo: 2022-01-25 18:00:00'
                 }),
             'periodoFinal': forms.TextInput(attrs={
                 'class': "form-control", 
-                # 'style': 'max-width: 300px;',
                 'placeholder': 'Exemplo: 2022-01-29 18:00:00'
                 })
         }
@@ -99,12 +71,18 @@ class LeilaoForm(ModelForm):
         periodoFinal = self.data['periodoFinal']
 
         if type(periodoInicio) == str:
-            periodoInicio_dt = datetime.strptime(periodoInicio, '%Y-%m-%d %H:%M:%S')
+            try:
+                periodoInicio_dt = datetime.strptime(periodoInicio, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                raise ValidationError(_('Formato incorreto de data. Utilizar YY-MM-DD HH:mm:ss'))
         else:
             periodoInicio_dt = periodoInicio
         
         if type(periodoFinal) == str:
-            periodoFinal_dt = datetime.strptime(periodoFinal, '%Y-%m-%d %H:%M:%S')
+            try:
+                periodoFinal_dt = datetime.strptime(periodoFinal, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                raise ValidationError(_('Formato incorreto de data. Utilizar YY-MM-DD HH:mm:ss'))
         else:
             periodoFinal_dt = periodoFinal
 
@@ -123,12 +101,18 @@ class LeilaoForm(ModelForm):
         periodoFinal = self.cleaned_data['periodoFinal']
 
         if type(periodoInicio) == str:
-            periodoInicio_dt = datetime.strptime(periodoInicio, '%Y-%m-%d %H:%M:%S')
+            try:
+                periodoInicio_dt = datetime.strptime(periodoInicio, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                raise ValidationError(_('Formato incorreto de data. Utilizar YY-MM-DD HH:mm:ss'))
         else:
             periodoInicio_dt = periodoInicio
         
         if type(periodoFinal) == str:
-            periodoFinal_dt = datetime.strptime(periodoFinal, '%Y-%m-%d %H:%M:%S')
+            try:
+                periodoFinal_dt = datetime.strptime(periodoFinal, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                raise ValidationError(_('Formato incorreto de data. Utilizar YY-MM-DD HH:mm:ss'))
         else:
             periodoFinal_dt = periodoFinal
 

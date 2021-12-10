@@ -45,6 +45,22 @@ class LanceFormTest(TestCase):
 
 class LeilaoFormTest(TestCase):
 
+    def test_periodoInicio_sem_horario(self):
+        """Testa se o form é inválido caso o início do periódo do leilão for no passado."""
+        form = LeilaoForm(data={
+            'name' : 'Teste',
+            'periodoInicio': 'errado',
+            'periodoFinal': datetime.now(pytz.timezone('America/Sao_Paulo')) + timedelta(days=1)})
+        self.assertFalse(form.is_valid())
+
+    def test_periodoFinal_sem_horario(self):
+        """Testa se o form é inválido caso o início do periódo do leilão for no passado."""
+        form = LeilaoForm(data={
+            'name' : 'Teste',
+            'periodoInicio': datetime.now(pytz.timezone('America/Sao_Paulo')) + timedelta(days=2),
+            'periodoFinal': 'errado'})
+        self.assertFalse(form.is_valid())
+
     def test_periodoInicio_anterior_ao_horario_atual(self):
         """Testa se o form é inválido caso o início do periódo do leilão for no passado."""
         form = LeilaoForm(data={
@@ -104,29 +120,6 @@ class LeilaoFormTest(TestCase):
 
 class LoteFormTest(TestCase):
 
-    # def test_valor_minimo_de_lote_negativo(self):
-    #     """Testa se o valor mínimo de lote é inválido se for menor que zero"""
-    #     form = LoteForm(data={
-    #         'name' : 'Lote do Bernardo',
-    #         'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
-    #         'estado' : 'U',
-    #         'pago': False,
-    #         'valor_minimo_de_lote': -3,
-    #         'valor_minimo_de_reserva': 100,
-    #         'valor_minimo_por_lance': 50})
-    #     self.assertFalse(form.is_valid())
-
-    # def test_valor_minimo_de_lote_nulo(self):
-    #     """Testa se o valor mínimo de lote é inválido se for igual a zero"""
-    #     form = LoteForm(data={
-    #         'name' : 'Lote do Bernardo',
-    #         'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
-    #         'estado' : 'U',
-    #         'valor_minimo_de_lote': 0,
-    #         'valor_minimo_de_reserva': 100,
-    #         'valor_minimo_por_lance': 50})
-    #     self.assertFalse(form.is_valid())
-
     def test_valor_minimo_de_reserva_nulo(self):
         """Testa se o valor mínimo de reserva é inválido se for menor ou igual a zero"""
         form = LoteForm(data={
@@ -148,39 +141,6 @@ class LoteFormTest(TestCase):
             'valor_minimo_de_reserva': -30,
             'valor_minimo_por_lance': 50})
         self.assertFalse(form.is_valid())
-
-    # def test_valor_minimo_de_reserva_menor_que_o_valor_minimo(self):
-    #     """Testa se o valor mínimo de reserva é inválido se for menor que o valor mínimo"""
-    #     form = LoteForm(data={
-    #         'name' : 'Lote do Bernardo',
-    #         'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
-    #         'estado' : 'U',
-    #         'valor_minimo_de_lote': 100,
-    #         'valor_minimo_de_reserva': 20,
-    #         'valor_minimo_por_lance': 50})
-    #     self.assertFalse(form.is_valid())
-
-    # def test_valor_minimo_de_lance_nulo(self):
-    #     """Testa se o valor mínimo de lance é inválido se for nulo"""
-    #     form = LoteForm(data={
-    #         'name' : 'Lote do Bernardo',
-    #         'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
-    #         'estado' : 'U',
-    #         'valor_minimo_de_lote': 20,
-    #         'valor_minimo_de_reserva': 100,
-    #         'valor_minimo_por_lance': 0})
-    #     self.assertFalse(form.is_valid())
-
-    # def test_valor_minimo_de_lance_negativo(self):
-    #     """Testa se o valor mínimo de lance é inválido se for negativo"""
-    #     form = LoteForm(data={
-    #         'name' : 'Lote do Bernardo',
-    #         'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
-    #         'estado' : 'U',
-    #         'valor_minimo_de_lote': 20,
-    #         'valor_minimo_de_reserva': 100,
-    #         'valor_minimo_por_lance': -15})
-    #     self.assertFalse(form.is_valid())
 
     def test_valores_validos(self):
         """Testa se o valor mínimo de reserva, de lote e por lance são válidos"""
