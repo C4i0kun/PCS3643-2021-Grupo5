@@ -5,25 +5,43 @@ from django.test import TestCase
 from datetime import datetime, timezone, timedelta
 import pytz
 from ..views import LoteForm, LeilaoForm, LanceForm
+from ..models import Lote, Leilao, Lance
+from django.contrib.auth.models import User
 
 class LanceFormTest(TestCase):
+    @classmethod
+    def setUp(self):
+        self.usuario_vendedor = User.objects.create_user(username='caio', password='caio123')
+        self.lote = Lote.objects.create(name="lote_lance", descricao="teste",
+                            estado="N", valor_minimo_de_lote=1000, taxa_de_comissao=1/100,
+                            valor_minimo_de_reserva=2000, valor_minimo_por_lance=200,
+                            vendedor=self.usuario_vendedor, pago=False)
+        self.leilao = Leilao.objects.create(name="leilao_lance",
+                            periodoInicio=datetime.now(pytz.timezone('America/Sao_Paulo')) + timedelta(hours=1),
+                            periodoFinal=datetime.now(pytz.timezone('America/Sao_Paulo')) + timedelta(days=3),
+                            pago=False, lote=self.lote)
 
     def test_valor_igual_a_zero(self):
         """Test form é inválido se o valor é igual a zero."""
-        form = LanceForm(data={'valor': 0})
+        form = LanceForm(data={'valor': 0}, leilao=self.leilao)
+        self.assertFalse(form.is_valid())
+
+    def test_valor_menor(self):
+        """Test form é inválido se o valor é menor do que o valor de lote."""
+        form = LanceForm(data={'valor': 999}, leilao=self.leilao)
         self.assertFalse(form.is_valid())
 
     def test_valor_minimo(self):
-        """Test form é válido se o valor é igual a um."""
-        form = LanceForm(data={'valor': 1})
+        """Test form é válido se o valor é igual ao valor de lote."""
+        form = LanceForm(data={'valor': 1000}, leilao=self.leilao)
         self.assertTrue(form.is_valid())
 
     def test_valor_field_label(self):
         """A label de valor é 'Valor'."""
-        form = LanceForm()
+        form = LanceForm(data={'valor': 1}, leilao=self.leilao)
         self.assertTrue(
             form.fields['valor'].label is None or
-            form.fields['valor'].label == 'Valor')
+            form.fields['valor'].label == 'Valor do Lance')
 
 class LeilaoFormTest(TestCase):
 
@@ -86,27 +104,28 @@ class LeilaoFormTest(TestCase):
 
 class LoteFormTest(TestCase):
 
-    def test_valor_minimo_de_lote_negativo(self):
-        """Testa se o valor mínimo de lote é inválido se for menor que zero"""
-        form = LoteForm(data={
-            'name' : 'Lote do Bernardo',
-            'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
-            'estado' : 'U',
-            'valor_minimo_de_lote': -3,
-            'valor_minimo_de_reserva': 100,
-            'valor_minimo_por_lance': 50})
-        self.assertFalse(form.is_valid())
+    # def test_valor_minimo_de_lote_negativo(self):
+    #     """Testa se o valor mínimo de lote é inválido se for menor que zero"""
+    #     form = LoteForm(data={
+    #         'name' : 'Lote do Bernardo',
+    #         'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
+    #         'estado' : 'U',
+    #         'pago': False,
+    #         'valor_minimo_de_lote': -3,
+    #         'valor_minimo_de_reserva': 100,
+    #         'valor_minimo_por_lance': 50})
+    #     self.assertFalse(form.is_valid())
 
-    def test_valor_minimo_de_lote_nulo(self):
-        """Testa se o valor mínimo de lote é inválido se for igual a zero"""
-        form = LoteForm(data={
-            'name' : 'Lote do Bernardo',
-            'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
-            'estado' : 'U',
-            'valor_minimo_de_lote': 0,
-            'valor_minimo_de_reserva': 100,
-            'valor_minimo_por_lance': 50})
-        self.assertFalse(form.is_valid())
+    # def test_valor_minimo_de_lote_nulo(self):
+    #     """Testa se o valor mínimo de lote é inválido se for igual a zero"""
+    #     form = LoteForm(data={
+    #         'name' : 'Lote do Bernardo',
+    #         'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
+    #         'estado' : 'U',
+    #         'valor_minimo_de_lote': 0,
+    #         'valor_minimo_de_reserva': 100,
+    #         'valor_minimo_por_lance': 50})
+    #     self.assertFalse(form.is_valid())
 
     def test_valor_minimo_de_reserva_nulo(self):
         """Testa se o valor mínimo de reserva é inválido se for menor ou igual a zero"""
@@ -130,38 +149,38 @@ class LoteFormTest(TestCase):
             'valor_minimo_por_lance': 50})
         self.assertFalse(form.is_valid())
 
-    def test_valor_minimo_de_reserva_menor_que_o_valor_minimo(self):
-        """Testa se o valor mínimo de reserva é inválido se for menor que o valor mínimo"""
-        form = LoteForm(data={
-            'name' : 'Lote do Bernardo',
-            'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
-            'estado' : 'U',
-            'valor_minimo_de_lote': 100,
-            'valor_minimo_de_reserva': 20,
-            'valor_minimo_por_lance': 50})
-        self.assertFalse(form.is_valid())
+    # def test_valor_minimo_de_reserva_menor_que_o_valor_minimo(self):
+    #     """Testa se o valor mínimo de reserva é inválido se for menor que o valor mínimo"""
+    #     form = LoteForm(data={
+    #         'name' : 'Lote do Bernardo',
+    #         'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
+    #         'estado' : 'U',
+    #         'valor_minimo_de_lote': 100,
+    #         'valor_minimo_de_reserva': 20,
+    #         'valor_minimo_por_lance': 50})
+    #     self.assertFalse(form.is_valid())
 
-    def test_valor_minimo_de_lance_nulo(self):
-        """Testa se o valor mínimo de lance é inválido se for nulo"""
-        form = LoteForm(data={
-            'name' : 'Lote do Bernardo',
-            'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
-            'estado' : 'U',
-            'valor_minimo_de_lote': 20,
-            'valor_minimo_de_reserva': 100,
-            'valor_minimo_por_lance': 0})
-        self.assertFalse(form.is_valid())
+    # def test_valor_minimo_de_lance_nulo(self):
+    #     """Testa se o valor mínimo de lance é inválido se for nulo"""
+    #     form = LoteForm(data={
+    #         'name' : 'Lote do Bernardo',
+    #         'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
+    #         'estado' : 'U',
+    #         'valor_minimo_de_lote': 20,
+    #         'valor_minimo_de_reserva': 100,
+    #         'valor_minimo_por_lance': 0})
+    #     self.assertFalse(form.is_valid())
 
-    def test_valor_minimo_de_lance_negativo(self):
-        """Testa se o valor mínimo de lance é inválido se for negativo"""
-        form = LoteForm(data={
-            'name' : 'Lote do Bernardo',
-            'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
-            'estado' : 'U',
-            'valor_minimo_de_lote': 20,
-            'valor_minimo_de_reserva': 100,
-            'valor_minimo_por_lance': -15})
-        self.assertFalse(form.is_valid())
+    # def test_valor_minimo_de_lance_negativo(self):
+    #     """Testa se o valor mínimo de lance é inválido se for negativo"""
+    #     form = LoteForm(data={
+    #         'name' : 'Lote do Bernardo',
+    #         'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
+    #         'estado' : 'U',
+    #         'valor_minimo_de_lote': 20,
+    #         'valor_minimo_de_reserva': 100,
+    #         'valor_minimo_por_lance': -15})
+    #     self.assertFalse(form.is_valid())
 
     def test_valores_validos(self):
         """Testa se o valor mínimo de reserva, de lote e por lance são válidos"""
@@ -169,9 +188,7 @@ class LoteFormTest(TestCase):
             'name' : 'Lote do Bernardo',
             'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
             'estado' : 'U',
-            'valor_minimo_de_lote': 20,
-            'valor_minimo_de_reserva': 100,
-            'valor_minimo_por_lance': 50})
+            'valor_minimo_de_reserva': 100})
         self.assertTrue(form.is_valid())
 
     def test_outros_valores_validos(self):
@@ -180,7 +197,5 @@ class LoteFormTest(TestCase):
             'name' : 'Lote do Bernardo',
             'descricao' : '1 (Um) Bernardo um pouco desgastado pela Poli',
             'estado' : 'U',
-            'valor_minimo_de_lote': 199.9,
-            'valor_minimo_de_reserva': 2549.90,
-            'valor_minimo_por_lance': 10})
+            'valor_minimo_de_reserva': 2549.90})
         self.assertTrue(form.is_valid())

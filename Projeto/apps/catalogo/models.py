@@ -12,24 +12,6 @@ class CustomUser(User):
 
     tipo_usuario = models.CharField(max_length=1, choices=TIPO_USUARIO_CHOICES, blank=False, null=False)
 
-# class Comprador(models.Model):
-#     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-
-#     def __str__(self):
-#         return self.usuario
-
-# class Leiloeiro(models.Model):
-#     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-
-#     def __str__(self):
-#         return self.usuario
-
-# class Vendedor(models.Model):
-#     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-
-#     def __str__(self):
-#         return self.usuario
-
 class Lote(models.Model):
     ESTADO_CHOICES = (
         ("N", "Novo"),
