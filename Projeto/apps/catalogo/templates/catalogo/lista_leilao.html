@@ -61,7 +61,7 @@
         <hr class="item-title-divider">
         <p class="item-description"><b>Lote:</b> {{leilao.lote.name}}</p>
         <p class="item-description"><i>{{leilao.lote.descricao}}</i></p>
-        <a href="{% url 'catalogo:detalha_leilao' leilao.id %}"><p class="small-button bottom-anchor"></p>Ver Detalhes</p></a>
+        <a href="{% url 'catalogo:detalha_leilao' leilao.id %}"><p class="small-button bottom-anchor">Ver Detalhes</p></a>
     </div>
     {% empty %}
     <p class="item-none">Não há leilões não iniciados.</p>
