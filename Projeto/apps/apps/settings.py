@@ -90,7 +90,7 @@ DATABASES = {
         'NAME': 'leilaoDB',
         'USER': 'PCS3643',
         'PASSWORD': 'caibardo123',
-        'HOST': 'db', # change to 'db' to deploy
+        'HOST': 'db', # change to 'db' to deploy and 'localhost' to host locally
         'PORT': '3306',
     }
 }

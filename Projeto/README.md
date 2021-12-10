@@ -56,6 +56,8 @@ Agora você pode executar o servidor de desenvolvimento da web:
 
 Para acessar no aplicativo vá para o URL <http://localhost:8000/>
 
+❗ Para executar localmente, é importante modificar o nome do ```HOST``` do banco de dados para ```localhost```. Isso pode ser feito no arquivo ```settings.py```. Caso queira rodar o projeto no Okteto Cloud, mantenha o nome do ```HOST``` como ```db```.
+
 ## Como rodar testes automatizados? ✅
 
 ### Testes Unitários 🧱
