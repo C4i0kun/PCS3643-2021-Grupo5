@@ -1,6 +1,6 @@
 # Documentação Final
 
-### - [Relatório Final (com toda a documentação)](Documentação%20Final%20Grupo5-PCS3643)
+### - [Relatório Final (com toda a documentação)](Documentação%20Final%20Grupo5-PCS3643.pdf)
 
 ### - [Apresentação - Leilo.ar](Apresentação%20-%20Leiloar.pdf)
 
